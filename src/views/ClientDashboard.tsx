@@ -73,6 +73,12 @@ export const ClientDashboard: React.FC = () => {
   const [pickingAddress, setPickingAddress] = useState('');
   const [pickingCoords, setPickingCoords] = useState<{lat: number, lng: number} | null>(null);
 
+  // Delivery details states (celulares, categoría y comentarios)
+  const [pickupPhone, setPickupPhone] = useState(user?.phone || '');
+  const [deliveryPhone, setDeliveryPhone] = useState('');
+  const [deliveryCategory, setDeliveryCategory] = useState<'alimentos' | 'ropa' | 'documentos' | 'medicinas' | null>(null);
+  const [courierComments, setCourierComments] = useState('');
+
   // Search stages (radar or driver offers)
   const [searchingStage, setSearchingStage] = useState<'radar' | 'driver_offers'>('radar');
   const [radarCountdown, setRadarCountdown] = useState<number>(30);
@@ -137,6 +143,46 @@ export const ClientDashboard: React.FC = () => {
       setDirectionsRenderer(renderer);
     }
   }, [isMapApiLoaded, isMapApiFailed, googleMap]);
+
+  // 2.b. Auto-geolocation on load or fallback to Laura Caller, Los Olivos
+  useEffect(() => {
+    const defaultAddress = "C. 20 Mz.8A - Lt.4 (A.h Laura Caller)";
+    const defaultLat = -11.9708;
+    const defaultLng = -77.0815;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setOriginCoords({ lat, lng });
+
+          const google = (window as any).google;
+          if (isMapApiLoaded && !isMapApiFailed && google) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+              if (status === 'OK' && results[0]) {
+                setClientState(prev => ({ ...prev, origin: results[0].formatted_address }));
+              } else {
+                setClientState(prev => ({ ...prev, origin: defaultAddress }));
+              }
+            });
+          } else {
+            setClientState(prev => ({ ...prev, origin: defaultAddress }));
+          }
+        },
+        (error) => {
+          console.warn("Auto-geolocation denied or failed:", error);
+          // Fallback a la ubicación de referencia dada por el usuario (Laura Caller, Los Olivos)
+          setClientState(prev => ({ ...prev, origin: defaultAddress }));
+          setOriginCoords({ lat: defaultLat, lng: defaultLng });
+        }
+      );
+    } else {
+      setClientState(prev => ({ ...prev, origin: defaultAddress }));
+      setOriginCoords({ lat: defaultLat, lng: defaultLng });
+    }
+  }, [isMapApiLoaded, isMapApiFailed]);
 
   // 3. Autocomplete Setup for search modal
   useEffect(() => {
@@ -1612,11 +1658,118 @@ export const ClientDashboard: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* DETALLES DE SOLICITUD */}
+              <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+                <span className="section-title" style={{ display: 'block', marginBottom: '10px' }}>DETALLES DE SOLICITUD</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: '#8F909A', fontWeight: '700', marginBottom: '4px' }}>
+                      Celular de contacto (Recojo en origen)
+                    </label>
+                    <input 
+                      type="tel"
+                      className="form-control"
+                      placeholder="Ej. 987654321"
+                      value={pickupPhone}
+                      onChange={(e) => setPickupPhone(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        backgroundColor: '#1E1E20',
+                        border: '1px solid #27272A',
+                        borderRadius: '8px',
+                        color: '#FFFFFF',
+                        padding: '0 12px',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: '#8F909A', fontWeight: '700', marginBottom: '4px' }}>
+                      Celular de contacto (Entrega en destino)
+                    </label>
+                    <input 
+                      type="tel"
+                      className="form-control"
+                      placeholder="Ej. 912345678"
+                      value={deliveryPhone}
+                      onChange={(e) => setDeliveryPhone(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        backgroundColor: '#1E1E20',
+                        border: '1px solid #27272A',
+                        borderRadius: '8px',
+                        color: '#FFFFFF',
+                        padding: '0 12px',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ¿QUÉ VOY A ENTREGAR? */}
+              <div style={{ marginTop: '20px' }}>
+                <span className="section-title" style={{ display: 'block', marginBottom: '8px' }}>¿QUÉ VOY A ENTREGAR?</span>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {[
+                    { id: 'alimentos', label: '🍔 Alimentos' },
+                    { id: 'ropa', label: '👕 Ropa' },
+                    { id: 'documentos', label: '📄 Documentos' },
+                    { id: 'medicinas', label: '💊 Prod. Farmacéuticos' }
+                  ].map(cat => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setDeliveryCategory(cat.id as any)}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '20px',
+                        border: '1px solid #27272A',
+                        backgroundColor: deliveryCategory === cat.id ? 'var(--accent-lime)' : '#1E1E20',
+                        color: deliveryCategory === cat.id ? '#000000' : '#FFFFFF',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* COMENTARIOS PARA EL REPARTIDOR */}
+              <div style={{ marginTop: '20px', marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '11px', color: '#8F909A', fontWeight: '700', marginBottom: '6px' }}>
+                  COMENTARIOS PARA EL REPARTIDOR
+                </label>
+                <textarea
+                  className="form-control"
+                  placeholder="Ej. Entregar en portería del edificio, tocar el timbre 302..."
+                  rows={2}
+                  value={courierComments}
+                  onChange={(e) => setCourierComments(e.target.value)}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#1E1E20',
+                    border: '1px solid #27272A',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    resize: 'none'
+                  }}
+                />
+              </div>
             </div>
 
             <div className="modal-footer" style={{ padding: '12px' }}>
               <button className="btn btn-primary btn-md btn-block" onClick={handleStartSearch} disabled={!destinationInput}>
-                Confirmar Ruta
+                Guardar
               </button>
             </div>
           </div>
