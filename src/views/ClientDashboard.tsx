@@ -696,6 +696,10 @@ export const ClientDashboard: React.FC = () => {
     { id: 'camion', name: 'Camión', desc: 'S/ 120+', icon: '🏗️' }
   ];
 
+  const isSearchFieldEmpty = activeSearchField 
+    ? (activeSearchField === 'origin' ? (!clientState.origin || clientState.origin === 'Obteniendo GPS...') : (!destinationInput || destinationInput === 'Obteniendo GPS...'))
+    : true;
+
   return (
     <div className="mobile-container dark-theme">
       {/* PANTALLA INICIO */}
@@ -1576,55 +1580,59 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Botones rápidos de GPS y Mapa cuando el campo está vacío */}
-              {activeSearchField && (activeSearchField === 'origin' ? (!clientState.origin || clientState.origin === 'Obteniendo GPS...') : (!destinationInput || destinationInput === 'Obteniendo GPS...')) && (
-                <div className="quick-location-actions" style={{ display: 'flex', gap: '10px', marginTop: '12px', marginBottom: '8px' }}>
-                  <button 
-                    type="button"
-                    className="btn-quick-action"
-                    onClick={handleUseMyLocation}
-                    style={{
-                      flex: 1,
-                      height: '38px',
-                      backgroundColor: '#1E1E20',
-                      border: '1px solid #27272A',
-                      borderRadius: '8px',
-                      color: '#FFFFFF',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <span>📍</span> Mi ubicación
-                  </button>
-                  <button 
-                    type="button"
-                    className="btn-quick-action"
-                    onClick={handleStartMapPicking}
-                    style={{
-                      flex: 1,
-                      height: '38px',
-                      backgroundColor: '#1E1E20',
-                      border: '1px solid #27272A',
-                      borderRadius: '8px',
-                      color: '#FFFFFF',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <span>🗺️</span> Seleccionar mapa
-                  </button>
-                </div>
-              )}
+              {/* Botones rápidos de GPS y Mapa */}
+              <div className="quick-location-actions" style={{ display: 'flex', gap: '10px', marginTop: '12px', marginBottom: '8px' }}>
+                <button 
+                  type="button"
+                  className="btn-quick-action"
+                  onClick={handleUseMyLocation}
+                  disabled={!isSearchFieldEmpty}
+                  style={{
+                    flex: 1,
+                    height: '38px',
+                    backgroundColor: '#1E1E20',
+                    border: '1px solid #27272A',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    cursor: isSearchFieldEmpty ? 'pointer' : 'not-allowed',
+                    opacity: isSearchFieldEmpty ? 1 : 0.4,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <span>📍</span> Mi ubicación
+                </button>
+                <button 
+                  type="button"
+                  className="btn-quick-action"
+                  onClick={handleStartMapPicking}
+                  disabled={!isSearchFieldEmpty}
+                  style={{
+                    flex: 1,
+                    height: '38px',
+                    backgroundColor: '#1E1E20',
+                    border: '1px solid #27272A',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    cursor: isSearchFieldEmpty ? 'pointer' : 'not-allowed',
+                    opacity: isSearchFieldEmpty ? 1 : 0.4,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <span>🗺️</span> Seleccionar mapa
+                </button>
+              </div>
 
               {/* DETALLES DE SOLICITUD */}
               <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
