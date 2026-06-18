@@ -1626,39 +1626,6 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               )}
 
-              {/* Sugerencias de Lima */}
-              <div className="suggestions-section" style={{ marginTop: '16px' }}>
-                <span className="section-title">DIRECCIONES POPULARES</span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
-                  {['Av. Javier Prado 3375, Surco', 'Jr. de la Unión 800, Cercado', 'Av. Brasil 2555, Jesús María', 'Mega Plaza, Los Olivos'].map(addr => (
-                    <div 
-                      key={addr} 
-                      className="suggestion-item"
-                      onClick={() => {
-                        setDestinationInput(addr);
-                        setClientState(prev => ({ ...prev, destination: addr }));
-                        
-                        const popularCoords: { [key: string]: { lat: number, lng: number } } = {
-                          'Av. Javier Prado 3375, Surco': { lat: -12.0863, lng: -77.0096 },
-                          'Jr. de la Unión 800, Cercado': { lat: -12.0469, lng: -77.0305 },
-                          'Av. Brasil 2555, Jesús María': { lat: -12.0831, lng: -77.0492 },
-                          'Mega Plaza, Los Olivos': { lat: -11.9922, lng: -77.0617 }
-                        };
-                        if (popularCoords[addr]) {
-                          setDestCoords(popularCoords[addr]);
-                        }
-                        
-                        setShowSearchModal(false);
-                        setActiveSearchField(null);
-                      }}
-                    >
-                      <MapPin size={13} style={{ color: 'var(--text-secondary)' }} />
-                      <span>{addr}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* DETALLES DE SOLICITUD */}
               <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                 <span className="section-title" style={{ display: 'block', marginBottom: '10px' }}>DETALLES DE SOLICITUD</span>
