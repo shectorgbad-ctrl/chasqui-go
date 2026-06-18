@@ -275,64 +275,7 @@ export const DriverDashboard: React.FC = () => {
     }
   };
 
-  // Cargar pedidos mock si estamos en simulación
-  useEffect(() => {
-    if (isPlaceholder) {
-      setNearbyOrders([
-        {
-          id: 'o1',
-          price: 15.00,
-          clientName: 'Rubí',
-          clientAvatar: '👩',
-          clientRating: '5.0(6)',
-          timeAgo: 'Justo ahora',
-          distToClient: '2,2 km',
-          distRoute: '19,8 km',
-          pickupTitle: 'Los Grafitos',
-          pickupDetail: 'Jirón José Santos Atahualpa 540 (El Trebol 1 Etapa), El Sol (A.h el Sol), Los Heros 282 (Bellavista Cercado)',
-          badges: ['Multipuntos', 'Yape'],
-          comment: 'Cliente debe de yapearme primero y luego se entrega el pedido',
-          type: 'delivery',
-          origin: 'Los Grafitos, Bellavista',
-          destination: 'Los Heros 282, Bellavista',
-        },
-        {
-          id: 'o2',
-          price: 11.00,
-          clientName: 'usuario',
-          clientAvatar: '👤',
-          clientRating: '5.0(36)',
-          timeAgo: '4 min.',
-          distToClient: '3,7 km',
-          distRoute: '3,7 km',
-          pickupTitle: 'C. Luis Montero 3813 (Urb Panamericana Nte.)',
-          pickupDetail: 'Azucenas - Altura de paradero Las Gardenias',
-          badges: ['Yape'],
-          comment: 'Ropa - Pedir ubicación 983 801 558',
-          type: 'taxi',
-          origin: 'C. Luis Montero 3813',
-          destination: 'Azucenas, Los Olivos',
-        },
-        {
-          id: 'o3',
-          price: 16.80,
-          clientName: 'Nataly',
-          clientAvatar: '👩',
-          clientRating: '4.61(60)',
-          timeAgo: '36 seg.',
-          distToClient: '3,8 km',
-          distRoute: '28,6 km',
-          pickupTitle: 'Av. los Próceres de Huandoy Mz.BBB2 - Lt.25 (Urb la Floresta)',
-          pickupDetail: 'Los Jilgueros 335 (Urb San Cesar Etapa 1)',
-          badges: ['Yape', 'Solicitud de negocio'],
-          comment: 'Llevar documentos de oficina con mucho cuidado.',
-          type: 'delivery',
-          origin: 'Av. los Próceres de Huandoy',
-          destination: 'Los Jilgueros 335, San Cesar',
-        }
-      ]);
-    }
-  }, [isPlaceholder]);
+
 
   // Carga inicial y suscripción Realtime en Supabase
   useEffect(() => {
