@@ -82,6 +82,7 @@ export const ClientDashboard: React.FC = () => {
   // Search stages (radar or driver offers)
   const [searchingStage, setSearchingStage] = useState<'radar' | 'driver_offers'>('radar');
   const [autoAccept, setAutoAccept] = useState<boolean>(false);
+  const [offerCountdown, setOfferCountdown] = useState<number>(30);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -360,6 +361,29 @@ export const ClientDashboard: React.FC = () => {
       clearTimeout(timeoutId);
     };
   }, [clientState.status]);
+
+  // Countdown timer for driver offers in passenger dashboard
+  useEffect(() => {
+    let intervalId: any;
+    if (clientState.status === 'searching' && clientState.assignedDriver !== null) {
+      setOfferCountdown(30);
+
+      intervalId = setInterval(() => {
+        setOfferCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(intervalId);
+            handleRejectDriverOffer(); // Expired! Auto-reject and clean database
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      setOfferCountdown(30);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [clientState.status, clientState.assignedDriver]);
 
   // Auto accept simulation
   useEffect(() => {
@@ -1395,6 +1419,11 @@ export const ClientDashboard: React.FC = () => {
                         {isPlaceholder ? 'Chevrolet Sail' : (clientState.assignedDriver?.vehicle || 'Moto')}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Tiempo restante de oferta */}
+                  <div style={{ textAlign: 'center', fontSize: '11px', color: '#EF4444', fontWeight: '700', margin: '8px 0 2px 0' }}>
+                    La oferta expira en {offerCountdown} segundos
                   </div>
 
                   {/* Acciones */}

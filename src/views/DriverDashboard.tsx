@@ -88,23 +88,36 @@ export const DriverDashboard: React.FC = () => {
     if (!waitingState.isOpen || waitingState.status !== 'waiting') return;
 
     const interval = setInterval(() => {
+      let expired = false;
+      let orderToUpdate: any = null;
+
       setWaitingState(prev => {
         if (prev.countdown <= 1) {
           clearInterval(interval);
           if (prev.status === 'waiting') {
-            // Expired, clear driver_id in Supabase
-            if (!isPlaceholder && prev.order) {
-              supabase
-                .from('orders')
-                .update({ driver_id: null })
-                .eq('id', prev.order.id);
-            }
+            expired = true;
+            orderToUpdate = prev.order;
             return { ...prev, status: 'rejected', countdown: 0 };
           }
           return prev;
         }
         return { ...prev, countdown: prev.countdown - 1 };
       });
+
+      // Ejecutar la actualización de Supabase fuera del setState para evitar efectos secundarios
+      if (expired && !isPlaceholder && orderToUpdate) {
+        supabase
+          .from('orders')
+          .update({ driver_id: null })
+          .eq('id', orderToUpdate.id)
+          .then(({ error }) => {
+            if (error) {
+              console.warn("El conductor no pudo limpiar driver_id por RLS, confiando en el timeout del pasajero:", error.message);
+            } else {
+              console.log("El conductor limpió con éxito el driver_id al expirar la oferta.");
+            }
+          });
+      }
     }, 1000);
 
     return () => clearInterval(interval);
