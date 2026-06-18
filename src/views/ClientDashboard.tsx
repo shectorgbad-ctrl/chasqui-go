@@ -50,6 +50,7 @@ export const ClientDashboard: React.FC = () => {
   // Google Maps States
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
   const [isMapApiFailed, setIsMapApiFailed] = useState(false);
+  const [hasRealGPSLocation, setHasRealGPSLocation] = useState(false);
   const [originCoords, setOriginCoords] = useState<{lat: number, lng: number}>({ lat: -12.121493, lng: -77.029490 }); // Miraflores (default)
   const [destCoords, setDestCoords] = useState<{lat: number, lng: number} | null>(null);
   const [googleMap, setGoogleMap] = useState<any>(null);
@@ -145,9 +146,8 @@ export const ClientDashboard: React.FC = () => {
     }
   }, [isMapApiLoaded, isMapApiFailed, googleMap]);
 
-  // 2.b. Auto-geolocation on load or fallback to Laura Caller, Los Olivos
+  // 2.b. Auto-geolocation on load or fallback to empty/GPS label
   useEffect(() => {
-    const defaultAddress = "C. 20 Mz.8A - Lt.4 (A.h Laura Caller)";
     const defaultLat = -11.9708;
     const defaultLng = -77.0815;
 
@@ -156,45 +156,38 @@ export const ClientDashboard: React.FC = () => {
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          setHasRealGPSLocation(true);
           setOriginCoords({ lat, lng });
-
-          const google = (window as any).google;
-          if (isMapApiLoaded && !isMapApiFailed && google) {
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
-              if (status === 'OK' && results[0]) {
-                setClientState(prev => ({ ...prev, origin: results[0].formatted_address }));
-              } else {
-                setClientState(prev => ({ ...prev, origin: defaultAddress }));
-              }
-            });
-          }
         },
         (error) => {
           console.warn("Auto-geolocation denied or failed:", error);
-          // Fallback a la ubicación de referencia dada por el usuario (Laura Caller, Los Olivos)
-          setClientState(prev => ({ ...prev, origin: defaultAddress }));
+          // Si el GPS falla o es denegado, dejamos el origen vacío en lugar de autocompletar una dirección fija
+          setHasRealGPSLocation(false);
+          setClientState(prev => ({ ...prev, origin: "" }));
           setOriginCoords({ lat: defaultLat, lng: defaultLng });
         }
       );
     } else {
-      setClientState(prev => ({ ...prev, origin: defaultAddress }));
+      setHasRealGPSLocation(false);
+      setClientState(prev => ({ ...prev, origin: "" }));
       setOriginCoords({ lat: defaultLat, lng: defaultLng });
     }
-  }, [isMapApiLoaded, isMapApiFailed]);
+  }, []); // Run exactly once on mount
 
   // 2.c. Geocode coordinates once Google Maps API loads
   useEffect(() => {
     const google = (window as any).google;
-    if (isMapApiLoaded && !isMapApiFailed && google && originCoords && (clientState.origin === 'Obteniendo GPS...' || clientState.origin === 'Av. Larco 1045, Miraflores')) {
+    if (isMapApiLoaded && !isMapApiFailed && google && originCoords && hasRealGPSLocation) {
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ location: originCoords }, (results: any, status: any) => {
         if (status === 'OK' && results[0]) {
           setClientState(prev => ({ ...prev, origin: results[0].formatted_address }));
+        } else {
+          setClientState(prev => ({ ...prev, origin: "Mi ubicación (GPS)" }));
         }
       });
     }
-  }, [isMapApiLoaded, isMapApiFailed, originCoords]);
+  }, [isMapApiLoaded, isMapApiFailed, originCoords, hasRealGPSLocation]);
 
   // 3. Autocomplete Setup for search modal
   useEffect(() => {
@@ -650,6 +643,7 @@ export const ClientDashboard: React.FC = () => {
             if (status === 'OK' && results[0]) {
               const address = results[0].formatted_address;
               if (targetField === 'origin') {
+                setHasRealGPSLocation(true);
                 setClientState(prev => ({ ...prev, origin: address }));
                 setOriginCoords({ lat, lng });
                 if (googleMap) {
@@ -662,6 +656,7 @@ export const ClientDashboard: React.FC = () => {
             } else {
               const fallbackAddr = "Mi ubicación (GPS)"; // Letras amigables en vez de coordenadas
               if (targetField === 'origin') {
+                setHasRealGPSLocation(true);
                 setClientState(prev => ({ ...prev, origin: fallbackAddr }));
                 setOriginCoords({ lat, lng });
                 if (googleMap) {
@@ -677,6 +672,7 @@ export const ClientDashboard: React.FC = () => {
           // Demo fallback
           const demoAddr = "Mi ubicación (Av. Larco 1045, Miraflores)";
           if (targetField === 'origin') {
+            setHasRealGPSLocation(true);
             setClientState(prev => ({ ...prev, origin: demoAddr }));
             setOriginCoords({ lat: -12.121493, lng: -77.029490 });
             if (googleMap) {
@@ -690,19 +686,13 @@ export const ClientDashboard: React.FC = () => {
       },
       (error) => {
         console.warn('Error getting location:', error);
-        alert('No se pudo acceder al GPS. Asegúrate de otorgar permisos de ubicación en tu navegador y acceder desde una conexión segura (HTTPS). Usando ubicación por defecto (Miraflores, Lima).');
+        alert('No se pudo acceder al GPS. Asegúrate de otorgar permisos de ubicación en tu navegador y acceder desde una conexión segura (HTTPS).');
         
-        // Fallback to Miraflores
-        const fallbackAddr = "Mi ubicación (Miraflores, Lima)";
         if (targetField === 'origin') {
-          setClientState(prev => ({ ...prev, origin: fallbackAddr }));
-          setOriginCoords({ lat: -12.121493, lng: -77.029490 });
-          if (googleMap) {
-            googleMap.setCenter({ lat: -12.121493, lng: -77.029490 });
-          }
+          setHasRealGPSLocation(false);
+          setClientState(prev => ({ ...prev, origin: "" }));
         } else {
-          setDestinationInput(fallbackAddr);
-          setDestCoords({ lat: -12.121493, lng: -77.029490 });
+          setDestinationInput("");
         }
       },
       { enableHighAccuracy: true, timeout: 5000 }
@@ -757,7 +747,7 @@ export const ClientDashboard: React.FC = () => {
   ];
 
   const isSearchFieldEmpty = activeSearchField 
-    ? (activeSearchField === 'origin' ? (!clientState.origin || clientState.origin === 'Obteniendo GPS...') : (!destinationInput || destinationInput === 'Obteniendo GPS...'))
+    ? (activeSearchField === 'origin' ? clientState.origin !== 'Obteniendo GPS...' : destinationInput !== 'Obteniendo GPS...')
     : true;
 
   return (
