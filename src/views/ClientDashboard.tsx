@@ -365,7 +365,11 @@ export const ClientDashboard: React.FC = () => {
   // Countdown timer for driver offers in passenger dashboard
   useEffect(() => {
     let intervalId: any;
-    if (clientState.status === 'searching' && clientState.assignedDriver !== null) {
+    const isOfferActive = isPlaceholder
+      ? (clientState.status === 'searching' && searchingStage === 'driver_offers')
+      : (clientState.status === 'searching' && clientState.assignedDriver !== null);
+
+    if (isOfferActive) {
       setOfferCountdown(30);
 
       intervalId = setInterval(() => {
@@ -383,7 +387,7 @@ export const ClientDashboard: React.FC = () => {
     }
 
     return () => clearInterval(intervalId);
-  }, [clientState.status, clientState.assignedDriver]);
+  }, [clientState.status, clientState.assignedDriver, searchingStage, isPlaceholder]);
 
   // Auto accept simulation
   useEffect(() => {
