@@ -1080,15 +1080,62 @@ export const ClientDashboard: React.FC = () => {
               <div className="drag-handle" />
 
               {/* Ruta resumen */}
-              <div className="booking-route-summary">
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div className="booking-route-summary" style={{ position: 'relative' }}>
+                {/* Botón para editar toda la solicitud */}
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowSearchModal(true);
+                    setActiveSearchField('destination');
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--accent-lime)',
+                    fontSize: '11px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  ✏️ Editar
+                </button>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', paddingRight: '60px' }}>
                   <span style={{ color: 'var(--accent-lime)' }}>●</span>
                   <span className="route-text">De: <strong>{clientState.origin}</strong></span>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', borderTop: '1px solid #27272A', paddingTop: '6px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', borderTop: '1px solid #27272A', paddingTop: '6px', paddingRight: '60px' }}>
                   <span style={{ color: '#EF4444' }}>●</span>
                   <span className="route-text">A: <strong>{clientState.destination}</strong></span>
                 </div>
+
+                {/* Mostrar detalles adicionales de la solicitud en el resumen de viaje */}
+                {(pickupPhone || deliveryPhone || deliveryCategory || courierComments) && (
+                  <div style={{ marginTop: '8px', borderTop: '1px dashed #27272A', paddingTop: '8px', fontSize: '11px', color: '#8F909A', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {deliveryCategory && (
+                      <div>
+                        📦 Categoría: <strong style={{ color: '#FFFFFF' }}>{deliveryCategory === 'alimentos' ? '🍔 Alimentos' : deliveryCategory === 'ropa' ? '👕 Ropa' : deliveryCategory === 'documentos' ? '📄 Documentos' : '💊 Prod. Farmacéuticos'}</strong>
+                      </div>
+                    )}
+                    {(pickupPhone || deliveryPhone) && (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {pickupPhone && <span>📞 Recojo: <strong style={{ color: '#FFFFFF' }}>{pickupPhone}</strong></span>}
+                        {deliveryPhone && <span>📞 Entrega: <strong style={{ color: '#FFFFFF' }}>{deliveryPhone}</strong></span>}
+                      </div>
+                    )}
+                    {courierComments && (
+                      <div style={{ fontStyle: 'italic' }}>
+                        💬 Indicaciones: "{courierComments}"
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Selector de Servicios Horizontal */}
