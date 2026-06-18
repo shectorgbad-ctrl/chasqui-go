@@ -1,0 +1,12 @@
+/* Resets and clean layout for Chasqui Go */
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #050505;
+}
