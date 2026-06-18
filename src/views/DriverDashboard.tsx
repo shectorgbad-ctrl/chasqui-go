@@ -78,6 +78,38 @@ export const DriverDashboard: React.FC = () => {
     status: 'sending'
   });
 
+  const waitingStateRef = useRef(waitingState);
+  useEffect(() => {
+    waitingStateRef.current = waitingState;
+  }, [waitingState]);
+
+  // Countdown timer for active bid waiting state
+  useEffect(() => {
+    if (!waitingState.isOpen || waitingState.status !== 'waiting') return;
+
+    const interval = setInterval(() => {
+      setWaitingState(prev => {
+        if (prev.countdown <= 1) {
+          clearInterval(interval);
+          if (prev.status === 'waiting') {
+            // Expired, clear driver_id in Supabase
+            if (!isPlaceholder && prev.order) {
+              supabase
+                .from('orders')
+                .update({ driver_id: null })
+                .eq('id', prev.order.id);
+            }
+            return { ...prev, status: 'rejected', countdown: 0 };
+          }
+          return prev;
+        }
+        return { ...prev, countdown: prev.countdown - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [waitingState.isOpen, waitingState.status, isPlaceholder]);
+
   // 1. Google Maps Script Loader
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -289,6 +321,7 @@ export const DriverDashboard: React.FC = () => {
           .from('orders')
           .select('*, client_profile:profiles!client_id(name, phone)')
           .eq('status', 'searching')
+          .or(`driver_id.is.null,driver_id.eq.${user.id}`)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -320,8 +353,25 @@ export const DriverDashboard: React.FC = () => {
           const newRow = payload.new;
           const oldRow = payload.old;
 
+          // Check if this update relates to our active bid
+          const activeBid = waitingStateRef.current;
+          if (activeBid.isOpen && activeBid.order && activeBid.order.id === newRow.id) {
+            if (newRow.status === 'driver_incoming' && newRow.driver_id === user.id) {
+              setWaitingState(prev => ({ ...prev, status: 'accepted' }));
+              setTimeout(() => {
+                handleAcceptOrder(formatDbOrder(newRow));
+                setWaitingState({ isOpen: false, order: null, countdown: 30, status: 'sending' });
+              }, 1200);
+            } else if (newRow.driver_id === null || newRow.status === 'cancelled') {
+              setWaitingState(prev => ({ ...prev, status: 'rejected' }));
+              setTimeout(() => {
+                setWaitingState({ isOpen: false, order: null, countdown: 30, status: 'sending' });
+              }, 1500);
+            }
+          }
+
           if (eventType === 'INSERT') {
-            if (newRow.status === 'searching') {
+            if (newRow.status === 'searching' && (newRow.driver_id === null || newRow.driver_id === user.id)) {
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('name, phone')
@@ -335,7 +385,7 @@ export const DriverDashboard: React.FC = () => {
               });
             }
           } else if (eventType === 'UPDATE') {
-            if (newRow.status === 'searching') {
+            if (newRow.status === 'searching' && (newRow.driver_id === null || newRow.driver_id === user.id)) {
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('name, phone')
@@ -410,11 +460,11 @@ export const DriverDashboard: React.FC = () => {
   // Flujo de espera para aprobación del cliente (Bidding / Backup flow)
   const initiateAcceptanceFlow = async (order: any) => {
     if (!isPlaceholder) {
-      // Real database order acceptance
+      // Real database order acceptance (bidding/offer stage)
       setWaitingState({
         isOpen: true,
         order,
-        countdown: 2,
+        countdown: 30,
         status: 'sending'
       });
 
@@ -422,7 +472,6 @@ export const DriverDashboard: React.FC = () => {
         const { error } = await supabase
           .from('orders')
           .update({
-            status: 'driver_incoming',
             driver_id: user?.id || null,
             suggested_price: order.price
           })
@@ -430,18 +479,13 @@ export const DriverDashboard: React.FC = () => {
 
         if (error) throw error;
 
-        setWaitingState(prev => ({ ...prev, status: 'accepted', countdown: 0 }));
-        
-        setTimeout(() => {
-          handleAcceptOrder(order);
-          setWaitingState({ isOpen: false, order: null, countdown: 8, status: 'sending' });
-        }, 1000);
+        setWaitingState(prev => ({ ...prev, status: 'waiting' }));
       } catch (err: any) {
         console.error('Error updating order for acceptance:', err.message);
         setWaitingState(prev => ({ ...prev, status: 'rejected', countdown: 0 }));
-        alert('Error al aceptar orden: ' + err.message);
+        alert('Error al ofertar tarifa: ' + err.message);
         setTimeout(() => {
-          setWaitingState({ isOpen: false, order: null, countdown: 8, status: 'sending' });
+          setWaitingState({ isOpen: false, order: null, countdown: 30, status: 'sending' });
         }, 1500);
       }
       return;
@@ -494,8 +538,18 @@ export const DriverDashboard: React.FC = () => {
     }, 1000);
   };
 
-  const handleCancelWaiting = () => {
-    setWaitingState({ isOpen: false, order: null, countdown: 8, status: 'sending' });
+  const handleCancelWaiting = async () => {
+    if (!isPlaceholder && waitingState.order) {
+      try {
+        await supabase
+          .from('orders')
+          .update({ driver_id: null })
+          .eq('id', waitingState.order.id);
+      } catch (err: any) {
+        console.error('Error al cancelar oferta del conductor:', err.message);
+      }
+    }
+    setWaitingState({ isOpen: false, order: null, countdown: 30, status: 'sending' });
   };
 
   // Filtrado de solicitudes basado en la distancia al destino preferido del motorizado

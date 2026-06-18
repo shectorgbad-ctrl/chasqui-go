@@ -185,20 +185,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         },
         async (payload: any) => {
           const updatedOrder = payload.new;
-          if (updatedOrder.status === 'driver_incoming' && updatedOrder.driver_id) {
+          if (updatedOrder.status === 'searching') {
+            if (updatedOrder.driver_id) {
+              const { data: driverProfile } = await supabase
+                .from('profiles')
+                .select('name, phone, vehicle_type')
+                .eq('id', updatedOrder.driver_id)
+                .single();
+
+              setClientState(prev => ({
+                ...prev,
+                suggestedPrice: updatedOrder.suggested_price.toString(),
+                assignedDriver: {
+                  name: driverProfile?.name || 'Conductor',
+                  rating: 4.92,
+                  vehicle: driverProfile?.vehicle_type === 'moto' ? 'Honda GL125 (Moto) • ABC-123' : 'Automóvil de repartidor • ABC-123',
+                  plate: 'ABC-123',
+                  eta: 4
+                }
+              }));
+            } else {
+              setClientState(prev => ({
+                ...prev,
+                assignedDriver: null
+              }));
+            }
+          } else if (updatedOrder.status === 'driver_incoming' && updatedOrder.driver_id) {
             const { data: driverProfile } = await supabase
               .from('profiles')
-              .select('name, phone')
+              .select('name, phone, vehicle_type')
               .eq('id', updatedOrder.driver_id)
               .single();
 
             setClientState(prev => ({
               ...prev,
               status: 'driver_incoming',
+              suggestedPrice: updatedOrder.suggested_price.toString(),
               assignedDriver: {
                 name: driverProfile?.name || 'Carlos Quispe Mamani',
                 rating: 4.92,
-                vehicle: 'Honda GL125 (Moto) • ABC-123',
+                vehicle: driverProfile?.vehicle_type === 'moto' ? 'Honda GL125 (Moto) • ABC-123' : 'Automóvil de repartidor • ABC-123',
                 plate: 'ABC-123',
                 eta: 4
               },
@@ -226,10 +252,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               date: 'Hoy, ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
               origin: updatedOrder.origin,
               destination: updatedOrder.destination,
-              driverName: 'Carlos Q.',
+              driverName: clientState.assignedDriver?.name || 'Carlos Q.',
               rating: 5,
               price: Number(updatedOrder.suggested_price)
             });
+          } else if (updatedOrder.status === 'cancelled') {
+            resetClientState();
           }
         }
       )

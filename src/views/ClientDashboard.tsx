@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { supabase } from '../lib/supabaseClient';
 import { 
   Search, 
   MapPin, 
@@ -347,6 +348,10 @@ export const ClientDashboard: React.FC = () => {
         setRadarCountdown(prev => {
           if (prev <= 1) {
             clearInterval(intervalId);
+            setTimeout(() => {
+              handleCancelOrder();
+              alert('La solicitud ha expirado. No se encontraron conductores cercanos.');
+            }, 10);
             return 0;
           }
 
@@ -465,12 +470,36 @@ export const ClientDashboard: React.FC = () => {
     });
   };
 
-  const handleCancelOrder = () => {
+  const handleCancelOrder = async () => {
+    if (!isPlaceholder && clientState.orderId) {
+      try {
+        await supabase
+          .from('orders')
+          .update({ status: 'cancelled' })
+          .eq('id', clientState.orderId);
+      } catch (err: any) {
+        console.error('Error al cancelar la orden en Supabase:', err.message);
+      }
+    }
     resetClientState();
     setSearchingStage('radar');
   };
 
-  const handleAcceptDriverOffer = () => {
+  const handleAcceptDriverOffer = async () => {
+    if (!isPlaceholder && clientState.orderId) {
+      try {
+        const { error } = await supabase
+          .from('orders')
+          .update({ status: 'driver_incoming' })
+          .eq('id', clientState.orderId);
+        if (error) throw error;
+      } catch (err: any) {
+        console.error('Error al aceptar oferta del conductor en Supabase:', err.message);
+        alert('Error al aceptar oferta: ' + err.message);
+      }
+      return;
+    }
+
     setClientState(prev => ({
       ...prev,
       status: 'driver_incoming',
@@ -487,7 +516,21 @@ export const ClientDashboard: React.FC = () => {
     }));
   };
 
-  const handleRejectDriverOffer = () => {
+  const handleRejectDriverOffer = async () => {
+    if (!isPlaceholder && clientState.orderId) {
+      try {
+        const { error } = await supabase
+          .from('orders')
+          .update({ driver_id: null })
+          .eq('id', clientState.orderId);
+        if (error) throw error;
+        setClientState(prev => ({ ...prev, assignedDriver: null }));
+      } catch (err: any) {
+        console.error('Error al rechazar oferta en Supabase:', err.message);
+      }
+      return;
+    }
+
     // Retorna a radar temporalmente y vuelve a ofertar en 4 segundos
     setSearchingStage('radar');
     setRadarCountdown(15);
@@ -1212,18 +1255,20 @@ export const ClientDashboard: React.FC = () => {
           )}
 
           {/* SECUENCIA 1: BUSCANDO RADAR (CORRESPONDE A LA CAPTURA 2) */}
-          {clientState.status === 'searching' && searchingStage === 'radar' && (
+          {clientState.status === 'searching' && (isPlaceholder ? (searchingStage === 'radar') : (clientState.assignedDriver === null)) && (
             <div className="passenger-searching-sequence-container">
               
-              {/* Flotante: Vistos por conductores */}
-              <div className="conductores-visto-badge">
-                <div className="avatar-group-mini">
-                  <span className="mini-avatar">👨</span>
-                  <span className="mini-avatar">🧑</span>
-                  <span className="mini-avatar">👨</span>
+              {/* Flotante: Vistos por conductores (solo en modo demo) */}
+              {isPlaceholder && (
+                <div className="conductores-visto-badge">
+                  <div className="avatar-group-mini">
+                    <span className="mini-avatar">👨</span>
+                    <span className="mini-avatar">🧑</span>
+                    <span className="mini-avatar">👨</span>
+                  </div>
+                  <span>3 conductores han visto tu solicitud</span>
                 </div>
-                <span>3 conductores han visto tu solicitud</span>
-              </div>
+              )}
 
               {/* Card inferior blanca (Mejor Tarifa / Aumentar) */}
               <div className="bottom-sheet-white">
@@ -1325,7 +1370,7 @@ export const ClientDashboard: React.FC = () => {
           )}
 
           {/* SECUENCIA 2: SELECCIONAR CONDUCTOR (CORRESPONDE A LA CAPTURA 3) */}
-          {clientState.status === 'searching' && searchingStage === 'driver_offers' && (
+          {clientState.status === 'searching' && (isPlaceholder ? (searchingStage === 'driver_offers') : (clientState.assignedDriver !== null)) && (
             <div className="passenger-driver-offers-sequence-container">
               {/* Botón flotante superior */}
               <button 
@@ -1347,10 +1392,10 @@ export const ClientDashboard: React.FC = () => {
                   {/* Tarifa y ETA */}
                   <div className="offer-header-row">
                     <span className="offer-price-lbl">
-                      PEN {(priceOffer + 2.30).toFixed(2)}
+                      PEN {isPlaceholder ? (priceOffer + 2.30).toFixed(2) : Number(clientState.suggestedPrice).toFixed(2)}
                     </span>
                     <span className="offer-eta-lbl">
-                      4 min
+                      {isPlaceholder ? '4 min' : `${clientState.assignedDriver?.eta || 5} min`}
                     </span>
                   </div>
 
@@ -1361,12 +1406,12 @@ export const ClientDashboard: React.FC = () => {
                     </div>
                     <div className="offer-driver-details">
                       <div className="driver-name-rating">
-                        <strong>Anthony</strong>
-                        <span className="driver-rating-badge">★ 4.92</span>
-                        <span className="driver-trips-count">2796 viajes</span>
+                        <strong>{isPlaceholder ? 'Anthony' : (clientState.assignedDriver?.name || 'Conductor')}</strong>
+                        <span className="driver-rating-badge">★ {isPlaceholder ? '4.92' : (clientState.assignedDriver?.rating || '5.00')}</span>
+                        <span className="driver-trips-count">{isPlaceholder ? '2796' : '98'} viajes</span>
                       </div>
                       <div className="driver-car-desc">
-                        Chevrolet Sail
+                        {isPlaceholder ? 'Chevrolet Sail' : (clientState.assignedDriver?.vehicle || 'Moto')}
                       </div>
                     </div>
                   </div>
