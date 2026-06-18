@@ -867,10 +867,20 @@ export const DriverDashboard: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Direcciones */}
-                          <div className="address-section">
-                            <div className="pickup-title">{order.pickupTitle}</div>
-                            <div className="pickup-detail">{order.pickupDetail}</div>
+                          {/* Direcciones (Recojo y Entrega) */}
+                          <div className="address-section" style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '6px' }}>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', fontSize: '12.5px', lineHeight: '1.3' }}>
+                              <span style={{ color: 'var(--accent-lime)', marginTop: '3px' }}>●</span>
+                              <span style={{ color: 'var(--text-secondary)' }}>
+                                Recojo: <strong style={{ color: 'var(--text-primary)' }}>{order.pickupTitle}</strong>
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', fontSize: '12.5px', lineHeight: '1.3' }}>
+                              <span style={{ color: '#EF4444', marginTop: '3px' }}>●</span>
+                              <span style={{ color: 'var(--text-secondary)' }}>
+                                Entrega: <strong style={{ color: 'var(--text-primary)' }}>{order.destination.split(',')[0]}</strong>
+                              </span>
+                            </div>
                           </div>
 
                           {/* Etiquetas/Badges */}
