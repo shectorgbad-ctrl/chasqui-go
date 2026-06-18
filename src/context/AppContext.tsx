@@ -102,7 +102,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Estado del Cliente
   const [clientState, setClientState] = useState<ClientState>({
-    origin: 'Av. Larco 1045, Miraflores',
+    origin: 'Obteniendo GPS...',
     destination: '',
     service: 'delivery',
     suggestedPrice: '10.00',

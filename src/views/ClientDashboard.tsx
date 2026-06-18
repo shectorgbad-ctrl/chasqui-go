@@ -168,8 +168,6 @@ export const ClientDashboard: React.FC = () => {
                 setClientState(prev => ({ ...prev, origin: defaultAddress }));
               }
             });
-          } else {
-            setClientState(prev => ({ ...prev, origin: defaultAddress }));
           }
         },
         (error) => {
@@ -184,6 +182,19 @@ export const ClientDashboard: React.FC = () => {
       setOriginCoords({ lat: defaultLat, lng: defaultLng });
     }
   }, [isMapApiLoaded, isMapApiFailed]);
+
+  // 2.c. Geocode coordinates once Google Maps API loads
+  useEffect(() => {
+    const google = (window as any).google;
+    if (isMapApiLoaded && !isMapApiFailed && google && originCoords && (clientState.origin === 'Obteniendo GPS...' || clientState.origin === 'Av. Larco 1045, Miraflores')) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: originCoords }, (results: any, status: any) => {
+        if (status === 'OK' && results[0]) {
+          setClientState(prev => ({ ...prev, origin: results[0].formatted_address }));
+        }
+      });
+    }
+  }, [isMapApiLoaded, isMapApiFailed, originCoords]);
 
   // 3. Autocomplete Setup for search modal
   useEffect(() => {
