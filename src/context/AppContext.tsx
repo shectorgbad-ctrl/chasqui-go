@@ -64,7 +64,7 @@ interface AppContextType {
   clientState: ClientState;
   setClientState: React.Dispatch<React.SetStateAction<ClientState>>;
   resetClientState: () => void;
-  placeRealOrder: (price: number) => Promise<void>;
+  placeRealOrder: (price: number, metadata?: { pickupPhone?: string; deliveryPhone?: string; category?: string; comment?: string }) => Promise<void>;
   // Conductor
   driverState: DriverState;
   setDriverState: React.Dispatch<React.SetStateAction<DriverState>>;
@@ -667,7 +667,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const placeRealOrder = async (price: number) => {
+  const placeRealOrder = async (price: number, metadata?: { pickupPhone?: string; deliveryPhone?: string; category?: string; comment?: string }) => {
     if (isPlaceholder || !user) {
       setClientState(prev => ({
         ...prev,
@@ -678,12 +678,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     try {
+      let finalDestination = clientState.destination;
+      if (metadata) {
+        finalDestination += ' ||| ' + JSON.stringify(metadata);
+      }
+
       const { data, error } = await supabase
         .from('orders')
         .insert({
           client_id: user.id,
           origin: clientState.origin,
-          destination: clientState.destination,
+          destination: finalDestination,
           service: clientState.service,
           suggested_price: price,
           payment_method: clientState.paymentMethod,

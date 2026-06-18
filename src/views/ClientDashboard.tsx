@@ -41,7 +41,7 @@ const darkMapStyles = [
 ];
 
 export const ClientDashboard: React.FC = () => {
-  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem } = useApp();
+  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder } = useApp();
   const [activeTab, setActiveTab] = useState<'inicio' | 'historial' | 'billetera' | 'perfil'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
@@ -351,7 +351,7 @@ export const ClientDashboard: React.FC = () => {
           }
 
           // At 26 seconds left (after 4 seconds of searching), show driver offer
-          if (prev === 27) {
+          if (prev === 27 && isPlaceholder) {
             setSearchingStage('driver_offers');
           }
 
@@ -369,7 +369,7 @@ export const ClientDashboard: React.FC = () => {
 
   // Auto accept simulation
   useEffect(() => {
-    if (clientState.status === 'searching' && searchingStage === 'driver_offers' && autoAccept) {
+    if (clientState.status === 'searching' && searchingStage === 'driver_offers' && autoAccept && isPlaceholder) {
       const timeout = setTimeout(() => {
         handleAcceptDriverOffer();
         alert('¡Oferta aceptada automáticamente por el conductor más cercano!');
@@ -380,6 +380,7 @@ export const ClientDashboard: React.FC = () => {
 
   // Simulated active order timeline
   useEffect(() => {
+    if (!isPlaceholder) return;
     let timeoutId: any;
 
     if (clientState.status === 'driver_incoming') {
@@ -456,7 +457,12 @@ export const ClientDashboard: React.FC = () => {
   };
 
   const handleConfirmOrder = () => {
-    placeRealOrder(priceOffer);
+    placeRealOrder(priceOffer, {
+      pickupPhone,
+      deliveryPhone,
+      category: deliveryCategory || undefined,
+      comment: courierComments || undefined
+    });
   };
 
   const handleCancelOrder = () => {

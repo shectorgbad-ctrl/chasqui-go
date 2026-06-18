@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { supabase } from '../lib/supabaseClient';
 import { 
   ShieldCheck, 
   User, 
@@ -36,7 +37,7 @@ const darkMapStyles = [
 ];
 
 export const DriverDashboard: React.FC = () => {
-  const { user, logout, switchRole, driverState, setDriverState, setStep } = useApp();
+  const { user, logout, switchRole, driverState, setDriverState, setStep, isPlaceholder } = useApp();
   const [activeTab, setActiveTab] = useState<'inicio' | 'ganancias' | 'perfil'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
@@ -215,60 +216,209 @@ export const DriverDashboard: React.FC = () => {
     }
   }, [activeOrderSimulation]);
 
-  // Mock de Pedidos Cercanos
-  const [nearbyOrders, setNearbyOrders] = useState([
-    {
-      id: 'o1',
-      price: 15.00,
-      clientName: 'Rubí',
-      clientAvatar: '👩',
-      clientRating: '5.0(6)',
-      timeAgo: 'Justo ahora',
-      distToClient: '2,2 km',
-      distRoute: '19,8 km',
-      pickupTitle: 'Los Grafitos',
-      pickupDetail: 'Jirón José Santos Atahualpa 540 (El Trebol 1 Etapa), El Sol (A.h el Sol), Los Heros 282 (Bellavista Cercado)',
-      badges: ['Multipuntos', 'Yape'],
-      comment: 'Cliente debe de yapearme primero y luego se entrega el pedido',
-      type: 'delivery',
-      origin: 'Los Grafitos, Bellavista',
-      destination: 'Los Heros 282, Bellavista',
-    },
-    {
-      id: 'o2',
-      price: 11.00,
-      clientName: 'usuario',
-      clientAvatar: '👤',
-      clientRating: '5.0(36)',
-      timeAgo: '4 min.',
-      distToClient: '3,7 km',
-      distRoute: '3,7 km',
-      pickupTitle: 'C. Luis Montero 3813 (Urb Panamericana Nte.)',
-      pickupDetail: 'Azucenas - Altura de paradero Las Gardenias',
-      badges: ['Yape'],
-      comment: 'Ropa - Pedir ubicación 983 801 558',
-      type: 'taxi',
-      origin: 'C. Luis Montero 3813',
-      destination: 'Azucenas, Los Olivos',
-    },
-    {
-      id: 'o3',
-      price: 16.80,
-      clientName: 'Nataly',
-      clientAvatar: '👩',
-      clientRating: '4.61(60)',
-      timeAgo: '36 seg.',
-      distToClient: '3,8 km',
-      distRoute: '28,6 km',
-      pickupTitle: 'Av. los Próceres de Huandoy Mz.BBB2 - Lt.25 (Urb la Floresta)',
-      pickupDetail: 'Los Jilgueros 335 (Urb San Cesar Etapa 1)',
-      badges: ['Yape', 'Solicitud de negocio'],
-      comment: 'Llevar documentos de oficina con mucho cuidado.',
-      type: 'delivery',
-      origin: 'Av. los Próceres de Huandoy',
-      destination: 'Los Jilgueros 335, San Cesar',
+  const [nearbyOrders, setNearbyOrders] = useState<any[]>([]);
+
+  // Helper para formatear órden de base de datos
+  const formatDbOrder = (dbOrder: any) => {
+    let cleanDest = dbOrder.destination || '';
+    let metadata: any = null;
+
+    if (cleanDest.includes(' ||| ')) {
+      const parts = cleanDest.split(' ||| ');
+      cleanDest = parts[0];
+      try {
+        metadata = JSON.parse(parts[1]);
+      } catch (e) {
+        console.error('Error parsing order metadata:', e);
+      }
     }
-  ]);
+
+    const badges = [dbOrder.payment_method];
+    if (metadata?.category) {
+      const catFormatted = metadata.category.charAt(0).toUpperCase() + metadata.category.slice(1);
+      badges.push(catFormatted);
+    }
+
+    return {
+      id: dbOrder.id,
+      price: Number(dbOrder.suggested_price) || 10.0,
+      clientName: dbOrder.client_profile?.name || 'Cliente',
+      clientAvatar: '👤',
+      clientRating: '5.0(1)',
+      timeAgo: 'Justo ahora',
+      distToClient: '1.5 km',
+      distRoute: '4.8 km',
+      pickupTitle: dbOrder.origin.split(',')[0],
+      pickupDetail: dbOrder.origin,
+      badges: badges,
+      comment: metadata?.comment || '',
+      type: dbOrder.service === 'delivery' || dbOrder.service === 'express' || dbOrder.service === 'flete' ? 'delivery' : 'taxi',
+      origin: dbOrder.origin,
+      destination: cleanDest,
+      pickupPhone: metadata?.pickupPhone || dbOrder.client_profile?.phone || '',
+      deliveryPhone: metadata?.deliveryPhone || '',
+      category: metadata?.category || null
+    };
+  };
+
+  // Helper para actualizar estado de orden en base de datos
+  const updateDbOrderStatus = async (orderId: string, status: string) => {
+    if (isPlaceholder) return;
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status })
+        .eq('id', orderId);
+      if (error) throw error;
+    } catch (err: any) {
+      console.error(`Error actualizando orden a ${status}:`, err.message);
+    }
+  };
+
+  // Cargar pedidos mock si estamos en simulación
+  useEffect(() => {
+    if (isPlaceholder) {
+      setNearbyOrders([
+        {
+          id: 'o1',
+          price: 15.00,
+          clientName: 'Rubí',
+          clientAvatar: '👩',
+          clientRating: '5.0(6)',
+          timeAgo: 'Justo ahora',
+          distToClient: '2,2 km',
+          distRoute: '19,8 km',
+          pickupTitle: 'Los Grafitos',
+          pickupDetail: 'Jirón José Santos Atahualpa 540 (El Trebol 1 Etapa), El Sol (A.h el Sol), Los Heros 282 (Bellavista Cercado)',
+          badges: ['Multipuntos', 'Yape'],
+          comment: 'Cliente debe de yapearme primero y luego se entrega el pedido',
+          type: 'delivery',
+          origin: 'Los Grafitos, Bellavista',
+          destination: 'Los Heros 282, Bellavista',
+        },
+        {
+          id: 'o2',
+          price: 11.00,
+          clientName: 'usuario',
+          clientAvatar: '👤',
+          clientRating: '5.0(36)',
+          timeAgo: '4 min.',
+          distToClient: '3,7 km',
+          distRoute: '3,7 km',
+          pickupTitle: 'C. Luis Montero 3813 (Urb Panamericana Nte.)',
+          pickupDetail: 'Azucenas - Altura de paradero Las Gardenias',
+          badges: ['Yape'],
+          comment: 'Ropa - Pedir ubicación 983 801 558',
+          type: 'taxi',
+          origin: 'C. Luis Montero 3813',
+          destination: 'Azucenas, Los Olivos',
+        },
+        {
+          id: 'o3',
+          price: 16.80,
+          clientName: 'Nataly',
+          clientAvatar: '👩',
+          clientRating: '4.61(60)',
+          timeAgo: '36 seg.',
+          distToClient: '3,8 km',
+          distRoute: '28,6 km',
+          pickupTitle: 'Av. los Próceres de Huandoy Mz.BBB2 - Lt.25 (Urb la Floresta)',
+          pickupDetail: 'Los Jilgueros 335 (Urb San Cesar Etapa 1)',
+          badges: ['Yape', 'Solicitud de negocio'],
+          comment: 'Llevar documentos de oficina con mucho cuidado.',
+          type: 'delivery',
+          origin: 'Av. los Próceres de Huandoy',
+          destination: 'Los Jilgueros 335, San Cesar',
+        }
+      ]);
+    }
+  }, [isPlaceholder]);
+
+  // Carga inicial y suscripción Realtime en Supabase
+  useEffect(() => {
+    if (isPlaceholder || !user || user.role !== 'driver') return;
+
+    let isMounted = true;
+
+    const fetchActiveOrders = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, client_profile:profiles!client_id(name, phone)')
+          .eq('status', 'searching')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (isMounted && data) {
+          const formatted = data.map(formatDbOrder);
+          setNearbyOrders(formatted);
+        }
+      } catch (err: any) {
+        console.error('Error fetching active orders:', err.message);
+      }
+    };
+
+    fetchActiveOrders();
+
+    const channel = supabase
+      .channel('driver-orders-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        async (payload: any) => {
+          if (!isMounted) return;
+
+          const eventType = payload.eventType;
+          const newRow = payload.new;
+          const oldRow = payload.old;
+
+          if (eventType === 'INSERT') {
+            if (newRow.status === 'searching') {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('name, phone')
+                .eq('id', newRow.client_id)
+                .single();
+
+              const fullOrder = { ...newRow, client_profile: profile };
+              setNearbyOrders(prev => {
+                if (prev.some(o => o.id === fullOrder.id)) return prev;
+                return [formatDbOrder(fullOrder), ...prev];
+              });
+            }
+          } else if (eventType === 'UPDATE') {
+            if (newRow.status === 'searching') {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('name, phone')
+                .eq('id', newRow.client_id)
+                .single();
+
+              const fullOrder = { ...newRow, client_profile: profile };
+              setNearbyOrders(prev => {
+                const filtered = prev.filter(o => o.id !== fullOrder.id);
+                return [formatDbOrder(fullOrder), ...filtered];
+              });
+            } else {
+              setNearbyOrders(prev => prev.filter(o => o.id !== newRow.id));
+            }
+          } else if (eventType === 'DELETE') {
+            setNearbyOrders(prev => prev.filter(o => o.id !== oldRow.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, [user, isPlaceholder]);
 
   const handleToggleAvailability = () => {
     setDriverState(prev => ({
@@ -294,10 +444,12 @@ export const DriverDashboard: React.FC = () => {
   const handleNextSimulationStep = () => {
     if (simulationStep === 1) {
       setSimulationStep(2); // Paso 2: "Pasajero/Paquete recogido"
+      updateDbOrderStatus(activeOrderSimulation.id, 'in_progress');
     } else if (simulationStep === 2) {
       setSimulationStep(3); // Paso 3: "En camino al destino"
     } else if (simulationStep === 3) {
       setSimulationStep(4); // Paso 4: "Viaje completado"
+      updateDbOrderStatus(activeOrderSimulation.id, 'completed');
     } else if (simulationStep === 4) {
       // Finalizar simulación y sumar ganancias
       const payout = activeOrderSimulation.price;
@@ -313,7 +465,45 @@ export const DriverDashboard: React.FC = () => {
   };
 
   // Flujo de espera para aprobación del cliente (Bidding / Backup flow)
-  const initiateAcceptanceFlow = (order: any) => {
+  const initiateAcceptanceFlow = async (order: any) => {
+    if (!isPlaceholder) {
+      // Real database order acceptance
+      setWaitingState({
+        isOpen: true,
+        order,
+        countdown: 2,
+        status: 'sending'
+      });
+
+      try {
+        const { error } = await supabase
+          .from('orders')
+          .update({
+            status: 'driver_incoming',
+            driver_id: user?.id || null,
+            suggested_price: order.price
+          })
+          .eq('id', order.id);
+
+        if (error) throw error;
+
+        setWaitingState(prev => ({ ...prev, status: 'accepted', countdown: 0 }));
+        
+        setTimeout(() => {
+          handleAcceptOrder(order);
+          setWaitingState({ isOpen: false, order: null, countdown: 8, status: 'sending' });
+        }, 1000);
+      } catch (err: any) {
+        console.error('Error updating order for acceptance:', err.message);
+        setWaitingState(prev => ({ ...prev, status: 'rejected', countdown: 0 }));
+        alert('Error al aceptar orden: ' + err.message);
+        setTimeout(() => {
+          setWaitingState({ isOpen: false, order: null, countdown: 8, status: 'sending' });
+        }, 1500);
+      }
+      return;
+    }
+
     setWaitingState({
       isOpen: true,
       order,
@@ -554,7 +744,7 @@ export const DriverDashboard: React.FC = () => {
                   </div>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
                     <span style={{ color: '#EF4444' }}>●</span>
-                    <span>Entrega: <strong>{activeOrderSimulation.pickupDetail.split(',')[0]}</strong></span>
+                    <span>Entrega: <strong>{activeOrderSimulation.destination.split(',')[0]}</strong></span>
                   </div>
                 </div>
 
@@ -689,7 +879,7 @@ export const DriverDashboard: React.FC = () => {
                           {/* Etiquetas/Badges */}
                           {order.badges && order.badges.length > 0 && (
                             <div className="badges-row">
-                              {order.badges.map(badge => (
+                              {order.badges.map((badge: any) => (
                                 <span 
                                   key={badge} 
                                   className={`tag-badge ${badge.toLowerCase() === 'yape' ? 'yape' : 'general'}`}
