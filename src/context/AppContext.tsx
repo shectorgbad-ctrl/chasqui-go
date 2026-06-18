@@ -65,6 +65,10 @@ interface AppContextType {
   setClientState: React.Dispatch<React.SetStateAction<ClientState>>;
   resetClientState: () => void;
   placeRealOrder: (price: number, metadata?: { pickupPhone?: string; deliveryPhone?: string; category?: string; comment?: string }) => Promise<void>;
+  originCoords: {lat: number, lng: number};
+  setOriginCoords: React.Dispatch<React.SetStateAction<{lat: number, lng: number}>>;
+  hasRealGPSLocation: boolean;
+  setHasRealGPSLocation: React.Dispatch<React.SetStateAction<boolean>>;
   // Conductor
   driverState: DriverState;
   setDriverState: React.Dispatch<React.SetStateAction<DriverState>>;
@@ -111,6 +115,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     assignedDriver: null,
     chatMessages: []
   });
+
+  const [originCoords, setOriginCoords] = useState<{lat: number, lng: number}>({ lat: -12.121493, lng: -77.029490 }); // Miraflores (default)
+  const [hasRealGPSLocation, setHasRealGPSLocation] = useState(false);
 
   // Estado del Conductor
   const [driverState, setDriverState] = useState<DriverState>({
@@ -592,7 +599,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetClientState = () => {
     setClientState({
-      origin: 'Av. Larco 1045, Miraflores',
+      origin: 'Obteniendo GPS...',
       destination: '',
       service: 'delivery',
       suggestedPrice: '10.00',
@@ -601,6 +608,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       assignedDriver: null,
       chatMessages: []
     });
+    setOriginCoords({ lat: -12.121493, lng: -77.029490 });
+    setHasRealGPSLocation(false);
   };
 
   const uploadDocumentEvidence = async (docType: string, file: File) => {
@@ -763,7 +772,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateDocumentStatus,
         uploadDocumentEvidence,
         history,
-        addHistoryItem
+        addHistoryItem,
+        originCoords,
+        setOriginCoords,
+        hasRealGPSLocation,
+        setHasRealGPSLocation
       }}
     >
       {children}

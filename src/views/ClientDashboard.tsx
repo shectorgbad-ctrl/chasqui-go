@@ -42,7 +42,7 @@ const darkMapStyles = [
 ];
 
 export const ClientDashboard: React.FC = () => {
-  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder } = useApp();
+  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder, originCoords, setOriginCoords, hasRealGPSLocation, setHasRealGPSLocation } = useApp();
   const [activeTab, setActiveTab] = useState<'inicio' | 'historial' | 'billetera' | 'perfil'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
@@ -50,8 +50,6 @@ export const ClientDashboard: React.FC = () => {
   // Google Maps States
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
   const [isMapApiFailed, setIsMapApiFailed] = useState(false);
-  const [hasRealGPSLocation, setHasRealGPSLocation] = useState(false);
-  const [originCoords, setOriginCoords] = useState<{lat: number, lng: number}>({ lat: -12.121493, lng: -77.029490 }); // Miraflores (default)
   const [destCoords, setDestCoords] = useState<{lat: number, lng: number} | null>(null);
   const [googleMap, setGoogleMap] = useState<any>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<any>(null);
@@ -148,6 +146,8 @@ export const ClientDashboard: React.FC = () => {
 
   // 2.b. Auto-geolocation on load or fallback to empty/GPS label
   useEffect(() => {
+    if (hasRealGPSLocation) return; // Si ya se tiene una ubicación GPS real en el contexto, no re-geolocalizar
+
     const defaultLat = -11.9708;
     const defaultLng = -77.0815;
 
