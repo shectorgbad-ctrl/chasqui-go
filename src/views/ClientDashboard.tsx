@@ -81,7 +81,6 @@ export const ClientDashboard: React.FC = () => {
 
   // Search stages (radar or driver offers)
   const [searchingStage, setSearchingStage] = useState<'radar' | 'driver_offers'>('radar');
-  const [radarCountdown, setRadarCountdown] = useState<number>(30);
   const [autoAccept, setAutoAccept] = useState<boolean>(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -342,37 +341,23 @@ export const ClientDashboard: React.FC = () => {
 
   // Simulation timer for passenger search flow (matching user screenshots)
   useEffect(() => {
-    let intervalId: any;
+    let timeoutId: any;
     
     if (clientState.status === 'searching') {
-      setRadarCountdown(30);
       setSearchingStage('radar');
 
-      intervalId = setInterval(() => {
-        setRadarCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(intervalId);
-            setTimeout(() => {
-              handleCancelOrder();
-              alert('La solicitud ha expirado. No se encontraron conductores cercanos.');
-            }, 10);
-            return 0;
-          }
-
-          // At 26 seconds left (after 4 seconds of searching), show driver offer
-          if (prev === 27 && isPlaceholder) {
-            setSearchingStage('driver_offers');
-          }
-
-          return prev - 1;
-        });
-      }, 1000);
+      if (isPlaceholder) {
+        // En modo demo, mostrar oferta simulada de conductor tras 3 segundos
+        timeoutId = setTimeout(() => {
+          setSearchingStage('driver_offers');
+        }, 3000);
+      }
     } else {
       setSearchingStage('radar');
     }
 
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(timeoutId);
     };
   }, [clientState.status]);
 
@@ -537,7 +522,6 @@ export const ClientDashboard: React.FC = () => {
 
     // Retorna a radar temporalmente y vuelve a ofertar en 4 segundos
     setSearchingStage('radar');
-    setRadarCountdown(15);
     
     setTimeout(() => {
       // Si el cliente no ha cancelado, genera otra oferta
@@ -1279,15 +1263,11 @@ export const ClientDashboard: React.FC = () => {
                   <span style={{ fontSize: '13px', fontWeight: '800', color: '#18181B' }}>
                     Mejor tarifa. Tu solicitud tiene prioridad
                   </span>
-                  <span style={{ fontSize: '14px', fontWeight: '800', color: '#18181B', fontFamily: 'monospace' }}>
-                    0:{radarCountdown.toString().padStart(2, '0')}
+                  <span style={{ fontSize: '12px', color: '#22C55E', fontWeight: '700' }}>
+                    ● En tiempo real
                   </span>
                 </div>
-
-                {/* Barra de progreso */}
-                <div style={{ width: '100%', height: '4px', backgroundColor: '#E4E4E7', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', backgroundColor: '#000000', width: `${(radarCountdown / 30) * 100}%`, transition: 'width 1s linear' }} />
-                </div>
+                <div style={{ height: '12px' }} />
 
                 {/* Ajustador de Precio PEN */}
                 <div className="price-adjuster-row-white">
