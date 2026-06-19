@@ -1661,9 +1661,24 @@ export const ClientDashboard: React.FC = () => {
       {/* PANTALLA BILLETERA */}
       {activeTab === 'billetera' && (
         <div className="view-layout">
-          <div className="view-header" style={{ borderBottom: '1px solid var(--border-color)' }}>
-            <h2 className="view-title" style={{ fontSize: '17px', margin: 0 }}>Billetera</h2>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Métodos de pago en Gamarra y Lima</span>
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <h2 className="view-title" style={{ fontSize: '16px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Billetera</h2>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '500' }}>Métodos de pago en Gamarra y Lima</span>
+            </div>
           </div>
 
           <div className="view-body" style={{ padding: '16px 14px' }}>
@@ -1710,6 +1725,26 @@ export const ClientDashboard: React.FC = () => {
       {/* PANTALLA PERFIL */}
       {activeTab === 'perfil' && (
         <div className="view-layout">
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <h2 className="view-title" style={{ fontSize: '16px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Perfil</h2>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '500' }}>Configuración de tu cuenta</span>
+            </div>
+          </div>
+
           <div className="view-body" style={{ padding: '24px 14px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '24px' }}>
               <div className="profile-avatar-large">
