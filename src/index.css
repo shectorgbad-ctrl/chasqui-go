@@ -897,7 +897,7 @@ body {
 }
 
 .service-name {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -2366,7 +2366,7 @@ body {
 }
 
 .service-card-horizontal .service-name {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
   color: #A1A1AA;
 }

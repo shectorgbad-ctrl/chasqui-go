@@ -439,8 +439,8 @@ export const Welcome: React.FC = () => {
                   <Bike size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Delivery / Moto</span>
-                  <span className="option-desc">Mensajería, paquetes pequeños y distribución rápida</span>
+                  <span className="option-title">Motorizado</span>
+                  <span className="option-desc">Mensajería, delivery y envíos rápidos en motocicleta</span>
                 </div>
                 <div className="option-checkbox" />
               </div>
@@ -481,8 +481,8 @@ export const Welcome: React.FC = () => {
                   <Truck size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Flete / Cargo</span>
-                  <span className="option-desc">Mudanzas, transporte pesado y comercial</span>
+                  <span className="option-title">Mudanza / Carga</span>
+                  <span className="option-desc">Mudanzas, envíos pesados y transporte de carga</span>
                 </div>
                 <div className="option-checkbox" />
               </div>

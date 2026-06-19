@@ -767,10 +767,59 @@ export const ClientDashboard: React.FC = () => {
   };
 
   const services = [
-    { id: 'taxi', name: 'Auto (4 pers.)', desc: 'S/ 12-18', icon: '🚗' },
-    { id: 'taxi_premium', name: 'Auto Grande (6 pers.)', desc: 'S/ 18-25', icon: '🚙' },
-    { id: 'delivery', name: 'Delivery', desc: 'S/ 8-15', icon: '🛵' },
-    { id: 'flete', name: 'Flete', desc: 'S/ 45-80', icon: '🚛' }
+    { 
+      id: 'taxi', 
+      name: 'Auto (4 pers.)', 
+      desc: 'S/ 12-18', 
+      icon: (
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M23.5,12.5c-0.3,-0.5,-0.8,-0.9,-1.4,-1.1l-2.4,-0.8C18.6,8.2,16.5,6,14,6h-4C7.5,6,5.4,8.2,4.3,10.6l-2.4,0.8c-0.6,0.2,-1.1,0.6,-1.4,1.1c-0.3,0.5,-0.5,1.1,-0.5,1.7v2.3c0,0.8,0.7,1.5,1.5,1.5h1.2c0.3,-1.4,1.5,-2.5,3,-2.5s2.7,1.1,3,2.5h5.6c0.3,-1.4,1.5,-2.5,3,-2.5s2.7,1.1,3,2.5h1.2c0.8,0,1.5,-0.7,1.5,-1.5v-2.3C24,13.6,23.8,13,23.5,12.5z M6,10c0,-1.1,0.9,-2,2,-2h8c1.1,0,2,0.9,2,2v1H4v-1H6z" />
+          <circle cx="6.2" cy="18" r="1.8"/>
+          <circle cx="17.8" cy="18" r="1.8"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'taxi_premium', 
+      name: 'Auto Grande (6 pers.)', 
+      desc: 'S/ 18-25', 
+      icon: (
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M23.5,10.5c-0.3,-0.5,-0.8,-0.9,-1.4,-1.1l-3.2,-1.1C18.1,7,16.8,5,15,5H7C5.5,5,4.2,6.5,3.5,8.2L1.2,10.1C0.5,10.7,0,11.6,0,12.5v2.8C0,16.2,0.8,17,1.8,17h1.2c0.3,-1.4,1.5,-2.5,3,-2.5s2.7,1.1,3,2.5h6.6c0.3,-1.4,1.5,-2.5,3,-2.5s2.7,1.1,3,2.5h1.2c1,0,1.8,-0.8,1.8,-1.8v-2.8C24,11.8,23.8,11.1,23.5,10.5z M5,8c0,-1.1,0.9,-2,2,-2h7.5c1.1,0,2.2,1,2.5,2.2l0.8,2.8H4L5,8z" />
+          <circle cx="6.2" cy="17" r="1.8"/>
+          <circle cx="17.8" cy="17" r="1.8"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'delivery', 
+      name: 'Motorizado', 
+      desc: 'S/ 8-15', 
+      icon: (
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <circle cx="5.5" cy="17.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="18.5" cy="17.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="5.5" cy="17.5" r="1.2"/>
+          <circle cx="18.5" cy="17.5" r="1.2"/>
+          <path d="M3,17.5 C3,16 4.5,14.5 5.5,14.5 L9.5,14.5 L12,11 L14,7.5 C14.3,7 14.8,6.8 15.3,7 L17.5,7.8 C18,8 18.2,8.5 18,9 L16.8,11.5 L18.5,14.5 L20.5,14.5 C21.5,14.5 22.5,15.5 22.5,16.5 L22.5,17.5 L20.5,17.5 C20.2,16 19.5,15 18.5,15 L15.5,15 L14,17.5 L11,17.5 L10,15.5 L6.8,15.5 C6.2,15.5 5.8,16 5.5,17.5 L3.5,17.5 Z" />
+          <rect x="5.5" y="8" width="4.5" height="5.5" rx="1"/>
+          <circle cx="11.5" cy="6.2" r="1.5"/>
+          <path d="M10,8 C9.5,8 9,8.5 9,9.2 L9.5,12 C9.5,12.8 10.2,13.5 11,13.5 L12.5,13.5 L13.5,11.5 L12,8.5 L10,8 Z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'flete', 
+      name: 'Mudanza / Carga', 
+      desc: 'S/ 45-80', 
+      icon: (
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M20,8h-3V4c0-0.6-0.4-1-1-1H2C1.4,3,1,3.4,1,4v11c0,0.6,0.4,1,1,1h1.2c0.3-1.4,1.5-2.5,3-2.5s2.7,1.1,3,2.5h5.6c0.3-1.4,1.5-2.5,3-2.5s2.7,1.1,3,2.5H22c0.6,0,1-0.4,1-1v-4.5L20,8z M18,9.5h1.5l1.2,1.8H18V9.5z" />
+          <circle cx="6.2" cy="16" r="1.8"/>
+          <circle cx="17.8" cy="16" r="1.8"/>
+        </svg>
+      )
+    }
   ];
 
   const isSearchFieldEmpty = activeSearchField 
@@ -1576,11 +1625,11 @@ export const ClientDashboard: React.FC = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span className="history-type-tag">
-                        {item.type === 'delivery' ? '🛵 Delivery' 
-                          : item.type === 'flete' ? '🚛 Flete' 
+                        {item.type === 'delivery' ? '🛵 Motorizado' 
+                          : item.type === 'flete' ? '🚚 Mudanza / Carga' 
                           : item.type === 'taxi' ? '🚗 Auto (4 pers.)' 
                           : item.type === 'taxi_premium' ? '🚙 Auto Grande (6 pers.)' 
-                          : '🛵 Mototaxi'}
+                          : '🛵 Motorizado'}
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{item.date}</span>
                     </div>
