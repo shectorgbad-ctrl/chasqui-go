@@ -23,7 +23,8 @@ import {
   Bell,
   Car,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ArrowLeft
 } from 'lucide-react';
 
 const darkMapStyles = [
@@ -1737,20 +1738,10 @@ export const ClientDashboard: React.FC = () => {
             backgroundColor: 'var(--bg-card)'
           }}>
             <button 
+              className="back-btn"
               onClick={() => setActiveTab('inicio')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--accent-lime)',
-                cursor: 'pointer',
-                fontSize: '18px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px'
-              }}
             >
-              ⬅️
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
             </button>
             <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Centro de Seguridad</h2>
           </div>
