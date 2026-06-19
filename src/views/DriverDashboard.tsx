@@ -330,10 +330,16 @@ export const DriverDashboard: React.FC = () => {
 
     const fetchActiveOrders = async () => {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('orders')
           .select('*, client_profile:profiles!client_id(name, phone)')
-          .eq('status', 'searching')
+          .eq('status', 'searching');
+
+        if (user.vehicleType) {
+          query = query.eq('service', user.vehicleType);
+        }
+
+        const { data, error } = await query
           .or(`driver_id.is.null,driver_id.eq.${user.id}`)
           .order('created_at', { ascending: false });
 
@@ -383,8 +389,10 @@ export const DriverDashboard: React.FC = () => {
             }
           }
 
+          const matchesVehicleType = !user.vehicleType || newRow.service === user.vehicleType;
+
           if (eventType === 'INSERT') {
-            if (newRow.status === 'searching' && (newRow.driver_id === null || newRow.driver_id === user.id)) {
+            if (newRow.status === 'searching' && matchesVehicleType && (newRow.driver_id === null || newRow.driver_id === user.id)) {
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('name, phone')
@@ -398,7 +406,7 @@ export const DriverDashboard: React.FC = () => {
               });
             }
           } else if (eventType === 'UPDATE') {
-            if (newRow.status === 'searching' && (newRow.driver_id === null || newRow.driver_id === user.id)) {
+            if (newRow.status === 'searching' && matchesVehicleType && (newRow.driver_id === null || newRow.driver_id === user.id)) {
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('name, phone')

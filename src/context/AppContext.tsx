@@ -7,7 +7,7 @@ export interface User {
   email: string;
   phone: string;
   role: 'client' | 'driver';
-  vehicleType?: 'moto' | 'taxi' | 'camion';
+  vehicleType?: 'delivery' | 'taxi' | 'taxi_premium' | 'flete';
 }
 
 export interface Message {
@@ -57,7 +57,7 @@ interface AppContextType {
   step: 'welcome' | 'role_select' | 'register' | 'sms' | 'vehicle_select' | 'dashboard' | 'verification';
   setStep: (step: any) => void;
   registerUser: (name: string, email: string, phone: string, role: 'client' | 'driver') => Promise<void>;
-  selectVehicleType: (vehicleType: 'moto' | 'taxi' | 'camion') => Promise<void>;
+  selectVehicleType: (vehicleType: 'delivery' | 'taxi' | 'taxi_premium' | 'flete') => Promise<void>;
   logout: () => void;
   isPlaceholder: boolean;
   // Cliente
@@ -511,7 +511,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const selectVehicleType = async (vehicleType: 'moto' | 'taxi' | 'camion') => {
+  const selectVehicleType = async (vehicleType: 'delivery' | 'taxi' | 'taxi_premium' | 'flete') => {
     if (!user) return;
     const updatedUser: User = { ...user, vehicleType };
     setUser(updatedUser);

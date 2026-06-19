@@ -12,7 +12,8 @@ import {
   Info,
   Bike,
   Car,
-  Truck
+  Truck,
+  Sparkles
 } from 'lucide-react';
 
 export const Welcome: React.FC = () => {
@@ -24,7 +25,7 @@ export const Welcome: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [vehicle, setVehicle] = useState<'moto' | 'taxi' | 'camion'>('moto');
+  const [vehicle, setVehicle] = useState<'delivery' | 'taxi' | 'taxi_premium' | 'flete'>('delivery');
   
   // States para SMS
   const [smsCode, setSmsCode] = useState(['', '', '', '', '', '']);
@@ -374,15 +375,15 @@ export const Welcome: React.FC = () => {
 
             <div className="options-list" style={{ marginTop: '24px' }}>
               <div 
-                className={`option-card ${vehicle === 'moto' ? 'active' : ''}`}
-                onClick={() => setVehicle('moto')}
+                className={`option-card ${vehicle === 'delivery' ? 'active' : ''}`}
+                onClick={() => setVehicle('delivery')}
               >
                 <div className="option-icon-bg">
                   <Bike size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Moto lineal / Motorizado</span>
-                  <span className="option-desc">Mensajería express, delivery y mandados rápidos</span>
+                  <span className="option-title">Delivery / Moto</span>
+                  <span className="option-desc">Mensajería, paquetes pequeños y distribución rápida</span>
                 </div>
                 <div className="option-checkbox" />
               </div>
@@ -395,22 +396,36 @@ export const Welcome: React.FC = () => {
                   <Car size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Taxi / Auto Particular</span>
-                  <span className="option-desc">Transporte de personas y paquetes medianos/grandes</span>
+                  <span className="option-title">Taxi Estándar</span>
+                  <span className="option-desc">Transporte de personas y paquetes medianos</span>
                 </div>
                 <div className="option-checkbox" />
               </div>
 
               <div 
-                className={`option-card ${vehicle === 'camion' ? 'active' : ''}`}
-                onClick={() => setVehicle('camion')}
+                className={`option-card ${vehicle === 'taxi_premium' ? 'active' : ''}`}
+                onClick={() => setVehicle('taxi_premium')}
+              >
+                <div className="option-icon-bg">
+                  <Sparkles size={22} />
+                </div>
+                <div className="option-text">
+                  <span className="option-title">Taxi Premium</span>
+                  <span className="option-desc">Transporte exclusivo de personas en vehículos ejecutivos</span>
+                </div>
+                <div className="option-checkbox" />
+              </div>
+
+              <div 
+                className={`option-card ${vehicle === 'flete' ? 'active' : ''}`}
+                onClick={() => setVehicle('flete')}
               >
                 <div className="option-icon-bg">
                   <Truck size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Flete / Camioneta / Camión</span>
-                  <span className="option-desc">Mudanzas, carga pesada y distribución comercial</span>
+                  <span className="option-title">Flete / Cargo</span>
+                  <span className="option-desc">Mudanzas, transporte pesado y comercial</span>
                 </div>
                 <div className="option-checkbox" />
               </div>
