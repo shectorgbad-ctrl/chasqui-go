@@ -28,7 +28,7 @@ export interface ClientState {
   orderId?: string;
   origin: string;
   destination: string;
-  service: 'mototaxi' | 'taxi' | 'taxi_premium' | 'delivery' | 'flete' | null;
+  service: 'taxi' | 'taxi_premium' | 'delivery' | 'flete' | null;
   suggestedPrice: string;
   paymentMethod: 'Efectivo' | 'Yape' | 'Plin';
   status: 'idle' | 'searching' | 'driver_incoming' | 'in_progress' | 'completed';

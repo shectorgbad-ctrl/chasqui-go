@@ -234,8 +234,8 @@ export const ClientDashboard: React.FC = () => {
   useEffect(() => {
     const google = (window as any).google;
     
-    // Determine the rate factor: S/ 1.00 per KM for motos (delivery and mototaxi), default S/ 1.50 for others
-    const isMoto = clientState.service === 'delivery' || clientState.service === 'mototaxi';
+    // Determine the rate factor: S/ 1.00 per KM for moto (delivery), default S/ 1.50 for others
+    const isMoto = clientState.service === 'delivery';
     const rateFactor = isMoto ? 1.00 : 1.50;
 
     const runSimulationPricing = () => {
@@ -754,7 +754,6 @@ export const ClientDashboard: React.FC = () => {
   };
 
   const services = [
-    { id: 'mototaxi', name: 'Mototaxi', desc: 'S/ 5-8', icon: '🛵' },
     { id: 'taxi', name: 'Taxi', desc: 'S/ 12-18', icon: '🚗' },
     { id: 'taxi_premium', name: 'Taxi Premium', desc: 'S/ 18-25', icon: '🚕' },
     { id: 'delivery', name: 'Delivery', desc: 'S/ 8-15', icon: '📦' },
@@ -1124,12 +1123,12 @@ export const ClientDashboard: React.FC = () => {
 
                   <div 
                     className="recent-item"
-                    onClick={() => handleSelectRecentRoute('Barranco', 'La Molina', 'mototaxi', 7.00)}
+                    onClick={() => handleSelectRecentRoute('Barranco', 'La Molina', 'delivery', 15.00)}
                   >
                     <Clock size={14} className="recent-icon" />
                     <div className="recent-details">
                       <span className="recent-title">Barranco → La Molina</span>
-                      <span className="recent-subtitle">Mototaxi • S/ 7.00</span>
+                      <span className="recent-subtitle">Delivery • S/ 15.00</span>
                     </div>
                     <ChevronRight size={14} style={{ color: 'var(--text-secondary)' }} />
                   </div>
