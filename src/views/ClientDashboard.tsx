@@ -1843,16 +1843,7 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               </details>
 
-              <details className="security-accordion">
-                <summary className="security-summary">
-                  <span className="summary-icon">🔒</span>
-                  <span className="summary-text">Protección de la privacidad</span>
-                  <span className="summary-chevron">▼</span>
-                </summary>
-                <div className="security-details-content">
-                  Protegemos tu identidad ocultando tu número de teléfono real. Las llamadas y comunicaciones se realizan mediante números enmascarados para evitar compartir información sensible.
-                </div>
-              </details>
+
 
               <details className="security-accordion">
                 <summary className="security-summary">
