@@ -862,11 +862,11 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 14px 18px;
+  padding: 12px 18px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -884,8 +884,8 @@ body {
 }
 
 .service-card-img-container {
-  width: 68px;
-  height: 68px;
+  width: 96px;
+  height: 96px;
   border-radius: 12px;
   background-color: rgba(0, 0, 0, 0.25);
   display: flex;
