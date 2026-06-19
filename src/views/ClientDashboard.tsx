@@ -1891,7 +1891,28 @@ export const ClientDashboard: React.FC = () => {
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
-                  Ante un eventual siniestro o desperfecto mecánico, contamos con una guía clara de asistencia telefónica y cobertura total del seguro contra accidentes (SOAT) de manera inmediata.
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 1: MANTÉN LA SERENIDAD Y EVALÚA LESIONES</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Conserva la tranquilidad y verifica inmediatamente el estado físico de todos los ocupantes del vehículo para comprobar si hay heridas.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 2: SOLICITA AUXILIO MÉDICO DE SER NECESARIO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Si hay personas afectadas, llama sin demora a una ambulancia o a los servicios de rescate y emergencias médicas locales.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 3: REPORTA EL SUCESO A LAS AUTORIDADES</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Informa el incidente de inmediato a la Policía Nacional para que acuda al lugar y se realice el informe policial reglamentario.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 4: COMUNÍCATE CON NUESTRO SOPORTE PRIORITARIO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Escríbenos a <a href="mailto:soporte@chasquigo.com" style={{ color: 'var(--accent-gold)', textDecoration: 'underline' }}>soporte@chasquigo.com</a> o repórtalo en tiempo real usando el chat interactivo de asistencia de la aplicación.</span>
+                    </div>
+                    <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '10px', marginTop: '4px' }}>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '12px', fontFamily: 'var(--font-title)', textAlign: 'center' }}>🛡️ VIAJE ASEGURADO DE PRINCIPIO A FIN</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', textAlign: 'center', fontStyle: 'italic' }}>En Chasqui Go tu tranquilidad es lo primero. Cada trayecto está respaldado por la cobertura completa del SOAT de principio a fin.</span>
+                    </div>
+                  </div>
                 </div>
               </details>
             </div>
