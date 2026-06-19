@@ -2523,3 +2523,13 @@ body {
 .social-or-divider:not(:empty)::after {
   margin-left: 1em;
 }
+
+/* Google Maps Native UI Cleanup - Hides copyright, keyboard shortcuts, and terms of service footer to match native apps */
+.gm-style-cc,
+.gm-style-cc + button,
+button[title="Keyboard shortcuts"],
+button[aria-label="Keyboard shortcuts"],
+.gmnoprint a, 
+.gmnoprint span {
+  display: none !important;
+}
