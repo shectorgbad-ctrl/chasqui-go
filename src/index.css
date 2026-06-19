@@ -2560,10 +2560,303 @@ body {
 
 /* Google Maps Native UI Cleanup - Hides copyright, keyboard shortcuts, and terms of service footer to match native apps */
 .gm-style-cc,
-.gm-style-cc + button,
 button[title="Keyboard shortcuts"],
 button[aria-label="Keyboard shortcuts"],
 .gmnoprint a, 
 .gmnoprint span {
   display: none !important;
+}
+
+/* ==========================================
+   PANTALLA DE SEGURIDAD - CHASQUI GO BRANDING
+   ========================================== */
+
+/* Inca Shield Widget */
+.inka-shield-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.15) 0%, rgba(15, 15, 16, 0.4) 100%);
+  border: 1px solid var(--accent-gold-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 16px;
+  margin-bottom: 24px;
+  text-align: center;
+  box-shadow: var(--shadow-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.inka-shield-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.inka-shield-outer-pulse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.08);
+  animation: shieldPulse 2.5s infinite ease-in-out;
+  margin-bottom: 12px;
+}
+
+.inka-shield-glow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #F59E0B 100%);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+}
+
+.inka-shield-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.inka-shield-text {
+  z-index: 1;
+}
+
+.inka-shield-title {
+  font-family: var(--font-title);
+  color: var(--accent-gold);
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.inka-shield-status {
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@keyframes shieldPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    transform: scale(0.96);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(212, 175, 55, 0);
+    transform: scale(1.04);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    transform: scale(0.96);
+  }
+}
+
+/* 2x2 Grid Layout */
+.security-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.security-grid-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.security-grid-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-gold-border);
+  box-shadow: var(--shadow-glow);
+}
+
+.security-grid-card:active {
+  transform: translateY(0);
+}
+
+.security-grid-card .card-icon {
+  font-size: 26px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.security-grid-card .card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.security-grid-card .card-title {
+  font-family: var(--font-title);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.security-grid-card .card-desc {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Custom Emergency styling */
+.security-grid-card.emergency {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(27, 27, 30, 0.9) 100%);
+}
+
+.security-grid-card.emergency:hover {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.security-grid-card.emergency .card-icon {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  animation: beaconPulse 1.5s infinite;
+}
+
+.security-grid-card.emergency .card-title {
+  color: #EF4444;
+}
+
+@keyframes beaconPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Accordion Section Title */
+.security-section-title {
+  font-family: var(--font-title);
+  color: var(--accent-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  padding-left: 2px;
+  border-left: 3px solid var(--accent-gold);
+  padding-bottom: 2px;
+  line-height: 1;
+}
+
+/* Security Accordion Details */
+.security-accordion-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.security-accordion {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.security-accordion[open] {
+  border-color: var(--accent-gold-border);
+  box-shadow: var(--shadow-glow);
+}
+
+.security-summary {
+  list-style: none; /* Hide default arrow in Chrome/Safari */
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+  position: relative;
+}
+
+.security-summary::-webkit-details-marker {
+  display: none; /* Hide default arrow in Safari */
+}
+
+.security-summary .summary-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: 8px;
+  color: var(--accent-gold);
+}
+
+.security-summary .summary-text {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--text-primary);
+  flex-grow: 1;
+}
+
+.security-summary .summary-chevron {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+  margin-left: 8px;
+}
+
+.security-accordion[open] .security-summary .summary-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-gold);
+}
+
+.security-details-content {
+  padding: 0 16px 14px 60px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  padding-top: 12px;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

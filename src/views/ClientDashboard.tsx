@@ -1754,234 +1754,139 @@ export const ClientDashboard: React.FC = () => {
             >
               ⬅️
             </button>
-            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800' }}>Centro de Seguridad</h2>
+            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Centro de Seguridad</h2>
           </div>
 
           <div className="view-body" style={{ padding: '16px 14px', overflowY: 'auto', height: 'calc(100% - 60px)' }}>
             
-            {/* Tarjetas de Acción Superior */}
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-              <div 
-                style={{
-                  flex: 1,
-                  backgroundColor: '#1E1E20',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '16px',
-                  padding: '16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>💬</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Canal de Soporte</span>
+            {/* Escudo de Protección Inca */}
+            <div className="inka-shield-container">
+              <div className="inka-shield-outer-pulse">
+                <div className="inka-shield-glow">
+                  <div className="inka-shield-icon">🛡️</div>
+                </div>
               </div>
-              <div 
-                style={{
-                  flex: 1,
-                  backgroundColor: '#1E1E20',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '16px',
-                  padding: '16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>👥</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Contactos de Confianza</span>
+              <div className="inka-shield-text">
+                <h3 className="inka-shield-title">Protección Activa Inka</h3>
+                <p className="inka-shield-status">Monitoreo de ruta Chasqui Guard activado y resguardando tu trayecto 24/7</p>
               </div>
             </div>
 
-            {/* Botón de Emergencia (Pánico) */}
-            <button 
-              onClick={() => {
-                if (confirm('¿Deseas realizar una llamada de emergencia al 105 (Policía Nacional)?')) {
-                  window.open('tel:105');
-                }
-              }}
-              style={{
-                width: '100%',
-                backgroundColor: '#DC2626',
-                border: 'none',
-                borderRadius: '14px',
-                padding: '14px',
-                color: '#FFFFFF',
-                fontSize: '15px',
-                fontWeight: '800',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                cursor: 'pointer',
-                marginBottom: '24px',
-                boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)'
-              }}
-            >
-              <span>🚨</span> Central de Ayuda 105
-            </button>
+            {/* Cuadrícula de Acciones de Seguridad 2x2 */}
+            <div className="security-grid-2x2">
+              {/* Llamada de Emergencia 105 */}
+              <div 
+                className="security-grid-card emergency" 
+                onClick={() => {
+                  if (window.confirm('¿Deseas realizar una llamada de emergencia al 105 (Policía Nacional)?')) {
+                    window.open('tel:105');
+                  }
+                }}
+              >
+                <div className="card-icon">🚨</div>
+                <div className="card-info">
+                  <span className="card-title">Ayuda 105</span>
+                  <span className="card-desc">Llamada de pánico directa a emergencias</span>
+                </div>
+              </div>
 
-            {/* Sección Informativa: Cómo estás protegido */}
-            <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '14px' }}>
+              {/* Canal de Soporte */}
+              <div 
+                className="security-grid-card" 
+                onClick={() => alert('Conectando con el canal de soporte prioritario de Chasqui Go. Un asesor se comunicará contigo en breve.')}
+              >
+                <div className="card-icon">💬</div>
+                <div className="card-info">
+                  <span className="card-title">Soporte Inka</span>
+                  <span className="card-desc">Atención inmediata de incidencias</span>
+                </div>
+              </div>
+
+              {/* Contactos de Confianza */}
+              <div 
+                className="security-grid-card" 
+                onClick={() => alert('Accediendo a la configuración de tu Círculo de Contactos de Confianza para compartir tu viaje en tiempo real.')}
+              >
+                <div className="card-icon">👥</div>
+                <div className="card-info">
+                  <span className="card-title">Contactos</span>
+                  <span className="card-desc">Comparte tu ubicación con tu círculo</span>
+                </div>
+              </div>
+
+              {/* Protocolo de Bienestar */}
+              <div 
+                className="security-grid-card" 
+                onClick={() => alert('Abriendo el manual de prevención, reporte y protocolos de seguridad vial Chasqui Go.')}
+              >
+                <div className="card-icon">📋</div>
+                <div className="card-info">
+                  <span className="card-title">Protocolos</span>
+                  <span className="card-desc">Regulaciones de bienestar y seguridad</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sección Informativa: Protocolos de Seguridad */}
+            <h3 className="security-section-title">
               ¿Cómo garantizamos tu tranquilidad?
             </h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              
-              {/* Tarjeta 1 */}
-              <div style={{
-                backgroundColor: '#1E1E20',
-                border: '1px solid var(--border-color)',
-                borderRadius: '14px',
-                padding: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px'
-              }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  color: 'var(--accent-lime)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0
-                }}>
-                  🛡️
+            <div className="security-accordion-container">
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">🛰️</span>
+                  <span className="summary-text">Monitoreo Satelital Inka</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  Vigilamos tu viaje en tiempo real vía GPS. Ante cualquier desvío o parada inusual, nuestro equipo activa un protocolo inmediato de verificación para garantizar tu total tranquilidad.
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Asistencia y Monitoreo Activo</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Seguimiento satelital en tiempo real durante tu trayecto con detección de anomalías.</span>
-                </div>
-              </div>
+              </details>
 
-              {/* Tarjeta 2 */}
-              <div style={{
-                backgroundColor: '#1E1E20',
-                border: '1px solid var(--border-color)',
-                borderRadius: '14px',
-                padding: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px'
-              }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  color: 'var(--accent-lime)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0
-                }}>
-                  🪪
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">🪪</span>
+                  <span className="summary-text">Validación Chasqui Certificada</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  Cada conductor pasa por un estricto filtro que incluye la validación de antecedentes policiales, verificación de documentos vigentes (SOAT, revisión técnica) y un óptimo estado del vehículo.
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Filtro y Validación de Socios</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Validación rigurosa de antecedentes judiciales, vigencia de brevete y estado del vehículo.</span>
-                </div>
-              </div>
+              </details>
 
-              {/* Tarjeta 3 */}
-              <div style={{
-                backgroundColor: '#1E1E20',
-                border: '1px solid var(--border-color)',
-                borderRadius: '14px',
-                padding: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px'
-              }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  color: 'var(--accent-lime)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0
-                }}>
-                  📞
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">📞</span>
+                  <span className="summary-text">Privacidad y Contacto Blindado</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  Protegemos tu identidad ocultando tu número de teléfono real. Las llamadas y comunicaciones se realizan mediante números enmascarados para evitar compartir información sensible.
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Privacidad de Contacto Resguardada</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Protección de datos personales que oculta tu número celular en llamadas de coordinación.</span>
-                </div>
-              </div>
+              </details>
 
-              {/* Tarjeta 4 */}
-              <div style={{
-                backgroundColor: '#1E1E20',
-                border: '1px solid var(--border-color)',
-                borderRadius: '14px',
-                padding: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px'
-              }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  color: 'var(--accent-lime)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0
-                }}>
-                  🎗️
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">🎗️</span>
+                  <span className="summary-text">Protocolo de Confort y Bienestar</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  Mantenemos altos estándares de limpieza e higiene en cada viaje. El uso de cinturón de seguridad, ventilación adecuada y una conducción defensiva y respetuosa son obligatorios.
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Protocolo de Bienestar en Ruta</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Normativa obligatoria de uso de elementos de seguridad vial y limpieza a bordo.</span>
-                </div>
-              </div>
+              </details>
 
-              {/* Tarjeta 5 */}
-              <div style={{
-                backgroundColor: '#1E1E20',
-                border: '1px solid var(--border-color)',
-                borderRadius: '14px',
-                padding: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px'
-              }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  color: 'var(--accent-lime)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0
-                }}>
-                  ⚠️
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">⚠️</span>
+                  <span className="summary-text">Guía de Acción y Cobertura SOAT</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  Ante un eventual siniestro o desperfecto mecánico, contamos con una guía clara de asistencia telefónica y cobertura total del seguro contra accidentes (SOAT) de manera inmediata.
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Guía de Respuesta ante Incidentes</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Protocolo de atención inmediata y cobertura de seguro contra accidentes (SOAT).</span>
-                </div>
-              </div>
-
+              </details>
             </div>
 
           </div>
