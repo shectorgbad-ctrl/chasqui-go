@@ -1826,7 +1826,20 @@ export const ClientDashboard: React.FC = () => {
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
-                  Cada conductor pasa por un estricto filtro que incluye la validación de antecedentes policiales, verificación de documentos vigentes (SOAT, revisión técnica) y un óptimo estado del vehículo.
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>1. SELECCIÓN LIBRE DEL CONDUCTOR</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Antes de aceptar una oferta, tienes la libertad de revisar la calificación en estrellas del conductor y el número total de servicios completados de manera exitosa.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>2. SOCIOS VERIFICADOS Y ACTIVADOS</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Cada miembro del equipo debe aprobar un estricto proceso de admisión. Validamos licencias de conducir vigentes, antecedentes del conductor y la documentación reglamentaria del vehículo.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>3. FOTOGRAFÍA DE PERFIL EN VIVO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Para un reconocimiento rápido y seguro al abordar, exigimos selfies reales tomadas directamente durante el registro oficial, evitando cualquier tipo de suplantación de identidad.</span>
+                    </div>
+                  </div>
                 </div>
               </details>
 
