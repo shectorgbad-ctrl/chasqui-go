@@ -89,13 +89,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Estado de sesión
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('chasqui_user');
-    return saved ? JSON.parse(saved) : null;
+    if (saved) {
+      const parsed = JSON.parse(saved) as User;
+      if ((parsed.vehicleType as any) === 'moto') {
+        parsed.vehicleType = 'delivery';
+      }
+      return parsed;
+    }
+    return null;
   });
 
   const [step, setStep] = useState<'welcome' | 'role_select' | 'register' | 'sms' | 'vehicle_select' | 'dashboard' | 'verification'>(() => {
     const savedUser = localStorage.getItem('chasqui_user');
     if (savedUser) {
       const parsed = JSON.parse(savedUser) as User;
+      if ((parsed.vehicleType as any) === 'moto') {
+        parsed.vehicleType = 'delivery';
+      }
       if (parsed.role === 'driver' && !parsed.vehicleType) {
         return 'vehicle_select';
       }
@@ -206,8 +216,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 assignedDriver: {
                   name: driverProfile?.name || 'Conductor',
                   rating: 4.92,
-                  vehicle: driverProfile?.vehicle_type === 'moto' ? 'Honda GL125 (Moto) • ABC-123' : 'Automóvil de repartidor • ABC-123',
-                  plate: 'ABC-123',
+                  vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
+                    ? 'Honda GL125 (Moto) • ABC-123' 
+                    : (driverProfile?.vehicle_type === 'taxi_premium' 
+                      ? 'Toyota Corolla (Taxi Premium) • VIP-999' 
+                      : (driverProfile?.vehicle_type === 'flete' 
+                        ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
+                        : 'Chevrolet Sail (Taxi Standard) • ABC-123')),
+                  plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
                   eta: 4
                 }
               }));
@@ -231,8 +247,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               assignedDriver: {
                 name: driverProfile?.name || 'Carlos Quispe Mamani',
                 rating: 4.92,
-                vehicle: driverProfile?.vehicle_type === 'moto' ? 'Honda GL125 (Moto) • ABC-123' : 'Automóvil de repartidor • ABC-123',
-                plate: 'ABC-123',
+                vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
+                  ? 'Honda GL125 (Moto) • ABC-123' 
+                  : (driverProfile?.vehicle_type === 'taxi_premium' 
+                    ? 'Toyota Corolla (Taxi Premium) • VIP-999' 
+                    : (driverProfile?.vehicle_type === 'flete' 
+                      ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
+                      : 'Chevrolet Sail (Taxi Standard) • ABC-123')),
+                plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
                 eta: 4
               },
               chatMessages: [
@@ -436,7 +458,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               email: profile.email,
               phone: profile.phone,
               role: profile.role,
-              vehicleType: profile.vehicle_type
+              vehicleType: profile.vehicle_type === 'moto' ? 'delivery' : profile.vehicle_type
             };
             setUser(loggedUser);
             localStorage.setItem('chasqui_user', JSON.stringify(loggedUser));
@@ -544,9 +566,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const switchRole = async (newRole: 'client' | 'driver') => {
     if (!user) return;
-    const updatedUser = { ...user, role: newRole };
-    setUser(updatedUser);
-    localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
 
     if (!isPlaceholder) {
       try {
@@ -556,6 +575,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .eq('id', user.id);
         
         if (error) throw error;
+
+        // Fetch the full profile to get the vehicle_type
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('vehicle_type')
+          .eq('id', user.id)
+          .single();
+
+        const dbVehicleType = profile?.vehicle_type === 'moto' ? 'delivery' : profile?.vehicle_type;
+        const updatedUser = { ...user, role: newRole, vehicleType: dbVehicleType };
+        setUser(updatedUser);
+        localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
         
         if (newRole === 'driver') {
           const { data: docs } = await supabase
