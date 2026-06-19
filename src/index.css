@@ -2464,3 +2464,62 @@ body {
   background-image: url('/images/peru_quipu_huaco.png');
 }
 
+/* Social Logins */
+.social-login-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-social-login {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-social-login:hover {
+  background-color: var(--bg-input);
+  border-color: var(--border-color-light);
+  transform: translateY(-1px);
+}
+
+.btn-social-login:active {
+  transform: translateY(0);
+}
+
+.social-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 8px 0;
+}
+
+.social-or-divider::before,
+.social-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.social-or-divider:not(:empty)::before {
+  margin-right: 1em;
+}
+
+.social-or-divider:not(:empty)::after {
+  margin-left: 1em;
+}
