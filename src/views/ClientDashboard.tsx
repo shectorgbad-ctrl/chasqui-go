@@ -1772,7 +1772,7 @@ export const ClientDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Cuadrícula de Acciones de Seguridad 2x2 */}
+            {/* Cuadrícula de Acciones de Seguridad */}
             <div className="security-grid-2x2">
               {/* Llamada de Emergencia 105 */}
               <div 
@@ -1813,18 +1813,6 @@ export const ClientDashboard: React.FC = () => {
                   <span className="card-desc">Comparte tu ubicación con tu círculo</span>
                 </div>
               </div>
-
-              {/* Protocolo de Bienestar */}
-              <div 
-                className="security-grid-card" 
-                onClick={() => alert('Abriendo el manual de prevención, reporte y protocolos de seguridad vial Chasqui Go.')}
-              >
-                <div className="card-icon">📋</div>
-                <div className="card-info">
-                  <span className="card-title">Protocolos</span>
-                  <span className="card-desc">Regulaciones de bienestar y seguridad</span>
-                </div>
-              </div>
             </div>
 
             {/* Sección Informativa: Protocolos de Seguridad */}
@@ -1835,19 +1823,8 @@ export const ClientDashboard: React.FC = () => {
             <div className="security-accordion-container">
               <details className="security-accordion">
                 <summary className="security-summary">
-                  <span className="summary-icon">🛰️</span>
-                  <span className="summary-text">Monitoreo Satelital Inka</span>
-                  <span className="summary-chevron">▼</span>
-                </summary>
-                <div className="security-details-content">
-                  Vigilamos tu viaje en tiempo real vía GPS. Ante cualquier desvío o parada inusual, nuestro equipo activa un protocolo inmediato de verificación para garantizar tu total tranquilidad.
-                </div>
-              </details>
-
-              <details className="security-accordion">
-                <summary className="security-summary">
                   <span className="summary-icon">🪪</span>
-                  <span className="summary-text">Validación Chasqui Certificada</span>
+                  <span className="summary-text">Validación de los conductores por los E.</span>
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
@@ -1857,8 +1834,8 @@ export const ClientDashboard: React.FC = () => {
 
               <details className="security-accordion">
                 <summary className="security-summary">
-                  <span className="summary-icon">📞</span>
-                  <span className="summary-text">Privacidad y Contacto Blindado</span>
+                  <span className="summary-icon">🔒</span>
+                  <span className="summary-text">Protección de la privacidad</span>
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
@@ -1868,7 +1845,13 @@ export const ClientDashboard: React.FC = () => {
 
               <details className="security-accordion">
                 <summary className="security-summary">
-                  <span className="summary-icon">🎗️</span>
+                  <span className="summary-icon" style={{ padding: '6px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+                      <path d="M3 5l18 14" />
+                      <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" stroke="none" />
+                      <path d="M12 9v6" stroke="var(--bg-card)" strokeWidth="1.5" />
+                    </svg>
+                  </span>
                   <span className="summary-text">Protocolo de Confort y Bienestar</span>
                   <span className="summary-chevron">▼</span>
                 </summary>
@@ -1880,7 +1863,7 @@ export const ClientDashboard: React.FC = () => {
               <details className="security-accordion">
                 <summary className="security-summary">
                   <span className="summary-icon">⚠️</span>
-                  <span className="summary-text">Guía de Acción y Cobertura SOAT</span>
+                  <span className="summary-text">Qué hacer en caso de un accidente</span>
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
