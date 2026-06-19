@@ -1604,9 +1604,24 @@ export const ClientDashboard: React.FC = () => {
       {/* PANTALLA HISTORIAL */}
       {activeTab === 'historial' && (
         <div className="view-layout">
-          <div className="view-header" style={{ borderBottom: '1px solid var(--border-color)' }}>
-            <h2 className="view-title" style={{ fontSize: '17px', margin: 0 }}>Historial</h2>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Tus mandados y viajes recientes</span>
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <h2 className="view-title" style={{ fontSize: '16px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Historial</h2>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '500' }}>Tus mandados y viajes recientes</span>
+            </div>
           </div>
 
           <div className="view-body" style={{ padding: '10px 14px' }}>
