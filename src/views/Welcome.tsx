@@ -453,8 +453,8 @@ export const Welcome: React.FC = () => {
                   <Car size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Taxi Estándar</span>
-                  <span className="option-desc">Transporte de personas y paquetes medianos</span>
+                  <span className="option-title">Auto (4 personas)</span>
+                  <span className="option-desc">Viajes y envíos en vehículos estándar de hasta 4 pasajeros</span>
                 </div>
                 <div className="option-checkbox" />
               </div>
@@ -467,8 +467,8 @@ export const Welcome: React.FC = () => {
                   <Sparkles size={22} />
                 </div>
                 <div className="option-text">
-                  <span className="option-title">Taxi Premium</span>
-                  <span className="option-desc">Transporte exclusivo de personas en vehículos ejecutivos</span>
+                  <span className="option-title">Auto Grande (6 personas)</span>
+                  <span className="option-desc">Viajes en camionetas, minivans o SUVs de hasta 6 pasajeros</span>
                 </div>
                 <div className="option-checkbox" />
               </div>

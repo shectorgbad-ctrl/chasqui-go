@@ -767,9 +767,9 @@ export const ClientDashboard: React.FC = () => {
   };
 
   const services = [
-    { id: 'taxi', name: 'Taxi', desc: 'S/ 12-18', icon: '🚗' },
-    { id: 'taxi_premium', name: 'Taxi Premium', desc: 'S/ 18-25', icon: '🚕' },
-    { id: 'delivery', name: 'Delivery', desc: 'S/ 8-15', icon: '📦' },
+    { id: 'taxi', name: 'Auto (4 pers.)', desc: 'S/ 12-18', icon: '🚗' },
+    { id: 'taxi_premium', name: 'Auto Grande (6 pers.)', desc: 'S/ 18-25', icon: '🚙' },
+    { id: 'delivery', name: 'Delivery', desc: 'S/ 8-15', icon: '🛵' },
     { id: 'flete', name: 'Flete', desc: 'S/ 45-80', icon: '🚛' }
   ];
 
@@ -1576,10 +1576,10 @@ export const ClientDashboard: React.FC = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span className="history-type-tag">
-                        {item.type === 'delivery' ? '📦 Delivery' 
+                        {item.type === 'delivery' ? '🛵 Delivery' 
                           : item.type === 'flete' ? '🚛 Flete' 
-                          : item.type === 'taxi' ? '🚗 Taxi' 
-                          : item.type === 'taxi_premium' ? '🚕 Taxi Premium' 
+                          : item.type === 'taxi' ? '🚗 Auto (4 pers.)' 
+                          : item.type === 'taxi_premium' ? '🚙 Auto Grande (6 pers.)' 
                           : '🛵 Mototaxi'}
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{item.date}</span>

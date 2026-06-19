@@ -219,10 +219,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
                     ? 'Honda GL125 (Moto) • ABC-123' 
                     : (driverProfile?.vehicle_type === 'taxi_premium' 
-                      ? 'Toyota Corolla (Taxi Premium) • VIP-999' 
+                      ? 'Toyota Avanza (Auto Grande) • VIP-999' 
                       : (driverProfile?.vehicle_type === 'flete' 
                         ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
-                        : 'Chevrolet Sail (Taxi Standard) • ABC-123')),
+                        : 'Chevrolet Sail (Auto) • ABC-123')),
                   plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
                   eta: 4
                 }
@@ -250,10 +250,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
                   ? 'Honda GL125 (Moto) • ABC-123' 
                   : (driverProfile?.vehicle_type === 'taxi_premium' 
-                    ? 'Toyota Corolla (Taxi Premium) • VIP-999' 
+                    ? 'Toyota Avanza (Auto Grande) • VIP-999' 
                     : (driverProfile?.vehicle_type === 'flete' 
                       ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
-                      : 'Chevrolet Sail (Taxi Standard) • ABC-123')),
+                      : 'Chevrolet Sail (Auto) • ABC-123')),
                 plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
                 eta: 4
               },
