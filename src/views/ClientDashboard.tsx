@@ -8,11 +8,9 @@ import {
   MessageSquare, 
   Phone, 
   X, 
-  Navigation, 
   Plus, 
   Minus, 
   Send,
-  User,
   CreditCard,
   History,
   LogOut,
@@ -2273,26 +2271,7 @@ export const ClientDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* BARRA DE NAVEGACIÓN INFERIOR (TABS) */}
-      {clientState.status === 'idle' && (
-        <div className="bottom-nav-bar">
-          <div 
-            className={`nav-tab ${activeTab === 'inicio' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inicio')}
-          >
-            <Navigation size={18} />
-            <span>Inicio</span>
-          </div>
 
-          <div 
-            className={`nav-tab ${activeTab === 'perfil' ? 'active' : ''}`}
-            onClick={() => setActiveTab('perfil')}
-          >
-            <User size={18} />
-            <span>Perfil</span>
-          </div>
-        </div>
-      )}
       {/* SIDE DRAWER (MENÚ LATERAL) */}
       {isDrawerOpen && (
         <div 
