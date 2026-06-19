@@ -1754,7 +1754,7 @@ export const ClientDashboard: React.FC = () => {
             >
               ⬅️
             </button>
-            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800' }}>Seguridad</h2>
+            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800' }}>Centro de Seguridad</h2>
           </div>
 
           <div className="view-body" style={{ padding: '16px 14px', overflowY: 'auto', height: 'calc(100% - 60px)' }}>
@@ -1776,7 +1776,7 @@ export const ClientDashboard: React.FC = () => {
                 }}
               >
                 <span style={{ fontSize: '24px' }}>💬</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Soporte</span>
+                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Canal de Soporte</span>
               </div>
               <div 
                 style={{
@@ -1793,7 +1793,7 @@ export const ClientDashboard: React.FC = () => {
                 }}
               >
                 <span style={{ fontSize: '24px' }}>👥</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Contactos de emergencia</span>
+                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Contactos de Confianza</span>
               </div>
             </div>
 
@@ -1822,12 +1822,12 @@ export const ClientDashboard: React.FC = () => {
                 boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)'
               }}
             >
-              <span>🚨</span> Llamar al 105
+              <span>🚨</span> Central de Ayuda 105
             </button>
 
             {/* Sección Informativa: Cómo estás protegido */}
             <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '14px' }}>
-              Cómo estás protegido
+              ¿Cómo garantizamos tu tranquilidad?
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1857,8 +1857,8 @@ export const ClientDashboard: React.FC = () => {
                   🛡️
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Soporte de seguridad proactivo</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Monitoreo GPS constante de tu ruta y alertas de desvíos inusuales.</span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Asistencia y Monitoreo Activo</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Seguimiento satelital en tiempo real durante tu trayecto con detección de anomalías.</span>
                 </div>
               </div>
 
@@ -1887,8 +1887,8 @@ export const ClientDashboard: React.FC = () => {
                   🪪
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Verificación de conductores</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Filtro riguroso de antecedentes penales, licencia y revisión ocular del vehículo.</span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Filtro y Validación de Socios</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Validación rigurosa de antecedentes judiciales, vigencia de brevete y estado del vehículo.</span>
                 </div>
               </div>
 
@@ -1917,8 +1917,8 @@ export const ClientDashboard: React.FC = () => {
                   📞
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Proteger la privacidad</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Enmascaramiento de números telefónicos en las llamadas entre conductor y pasajero.</span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Privacidad de Contacto Resguardada</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Protección de datos personales que oculta tu número celular en llamadas de coordinación.</span>
                 </div>
               </div>
 
@@ -1947,8 +1947,8 @@ export const ClientDashboard: React.FC = () => {
                   🎗️
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Mantener la seguridad en todos los viajes</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Políticas de uso obligatorio de cinturón de seguridad y normas de higiene.</span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Protocolo de Bienestar en Ruta</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Normativa obligatoria de uso de elementos de seguridad vial y limpieza a bordo.</span>
                 </div>
               </div>
 
@@ -1977,8 +1977,8 @@ export const ClientDashboard: React.FC = () => {
                   ⚠️
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Accidentes: pasos a seguir</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Guía de auxilio rápido y activación del seguro contra accidentes personales (SOAT).</span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Guía de Respuesta ante Incidentes</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Protocolo de atención inmediata y cobertura de seguro contra accidentes (SOAT).</span>
                 </div>
               </div>
 
@@ -2029,58 +2029,51 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Botones rápidos de GPS y Mapa */}
-              <div className="quick-location-actions" style={{ display: 'flex', gap: '10px', marginTop: '12px', marginBottom: '8px' }}>
-                <button 
-                  type="button"
-                  className="btn-quick-action"
-                  onClick={handleUseMyLocation}
-                  disabled={!isSearchFieldEmpty}
+              {/* Posicionamiento y Localización GPS/Mapa */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px', marginBottom: '8px' }}>
+                <div 
+                  onClick={isSearchFieldEmpty ? handleUseMyLocation : undefined}
                   style={{
-                    flex: 1,
-                    height: '38px',
-                    backgroundColor: '#1E1E20',
-                    border: '1px solid #27272A',
-                    borderRadius: '8px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: '700',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
+                    gap: '12px',
+                    padding: '10px 14px',
+                    backgroundColor: '#1E1E20',
+                    border: '1px solid #27272A',
+                    borderRadius: '12px',
                     cursor: isSearchFieldEmpty ? 'pointer' : 'not-allowed',
-                    opacity: isSearchFieldEmpty ? 1 : 0.4,
+                    opacity: isSearchFieldEmpty ? 1 : 0.5,
                     transition: 'all 0.2s'
                   }}
                 >
-                  <span>📍</span> Mi ubicación
-                </button>
-                <button 
-                  type="button"
-                  className="btn-quick-action"
-                  onClick={handleStartMapPicking}
-                  disabled={!isSearchFieldEmpty}
+                  <span style={{ fontSize: '18px', color: 'var(--accent-lime)' }}>📍</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#FFFFFF' }}>Fijar mi GPS actual</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Usa el satélite del celular para ubicarte</span>
+                  </div>
+                </div>
+
+                <div 
+                  onClick={isSearchFieldEmpty ? handleStartMapPicking : undefined}
                   style={{
-                    flex: 1,
-                    height: '38px',
-                    backgroundColor: '#1E1E20',
-                    border: '1px solid #27272A',
-                    borderRadius: '8px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: '700',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
+                    gap: '12px',
+                    padding: '10px 14px',
+                    backgroundColor: '#1E1E20',
+                    border: '1px solid #27272A',
+                    borderRadius: '12px',
                     cursor: isSearchFieldEmpty ? 'pointer' : 'not-allowed',
-                    opacity: isSearchFieldEmpty ? 1 : 0.4,
+                    opacity: isSearchFieldEmpty ? 1 : 0.5,
                     transition: 'all 0.2s'
                   }}
                 >
-                  <span>🗺️</span> Seleccionar mapa
-                </button>
+                  <span style={{ fontSize: '18px', color: 'var(--accent-lime)' }}>🗺️</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#FFFFFF' }}>Ubicar punto en el mapa táctil</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Arrastra el alfiler sobre la vista satelital</span>
+                  </div>
+                </div>
               </div>
 
               {/* DETALLES DE SOLICITUD */}
