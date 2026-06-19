@@ -297,7 +297,7 @@ export const DriverDashboard: React.FC = () => {
       pickupDetail: dbOrder.origin,
       badges: badges,
       comment: metadata?.comment || '',
-      type: dbOrder.service === 'delivery' || dbOrder.service === 'express' || dbOrder.service === 'flete' ? 'delivery' : 'taxi',
+      type: dbOrder.service === 'delivery' || dbOrder.service === 'flete' ? 'delivery' : 'taxi',
       origin: dbOrder.origin,
       destination: cleanDest,
       pickupPhone: metadata?.pickupPhone || dbOrder.client_profile?.phone || '',

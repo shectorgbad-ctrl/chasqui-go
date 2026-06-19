@@ -28,7 +28,7 @@ export interface ClientState {
   orderId?: string;
   origin: string;
   destination: string;
-  service: 'mototaxi' | 'taxi' | 'delivery' | 'express' | 'flete' | 'camion';
+  service: 'mototaxi' | 'taxi' | 'taxi_premium' | 'delivery' | 'flete' | null;
   suggestedPrice: string;
   paymentMethod: 'Efectivo' | 'Yape' | 'Plin';
   status: 'idle' | 'searching' | 'driver_incoming' | 'in_progress' | 'completed';
@@ -108,7 +108,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [clientState, setClientState] = useState<ClientState>({
     origin: 'Obteniendo GPS...',
     destination: '',
-    service: 'delivery',
+    service: null,
     suggestedPrice: '10.00',
     paymentMethod: 'Efectivo',
     status: 'idle',
@@ -601,7 +601,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setClientState({
       origin: 'Obteniendo GPS...',
       destination: '',
-      service: 'delivery',
+      service: null,
       suggestedPrice: '10.00',
       paymentMethod: 'Efectivo',
       status: 'idle',

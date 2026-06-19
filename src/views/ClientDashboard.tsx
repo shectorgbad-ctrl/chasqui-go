@@ -479,6 +479,10 @@ export const ClientDashboard: React.FC = () => {
   };
 
   const handleConfirmOrder = () => {
+    if (!clientState.service) {
+      alert('Por favor, selecciona un tipo de servicio primero.');
+      return;
+    }
     placeRealOrder(priceOffer, {
       pickupPhone,
       deliveryPhone,
@@ -752,10 +756,9 @@ export const ClientDashboard: React.FC = () => {
   const services = [
     { id: 'mototaxi', name: 'Mototaxi', desc: 'S/ 5-8', icon: '🛵' },
     { id: 'taxi', name: 'Taxi', desc: 'S/ 12-18', icon: '🚗' },
+    { id: 'taxi_premium', name: 'Taxi Premium', desc: 'S/ 18-25', icon: '🚕' },
     { id: 'delivery', name: 'Delivery', desc: 'S/ 8-15', icon: '📦' },
-    { id: 'express', name: 'Express', desc: 'S/ 10-20', icon: '⚡' },
-    { id: 'flete', name: 'Flete', desc: 'S/ 45-80', icon: '🚛' },
-    { id: 'camion', name: 'Camión', desc: 'S/ 120+', icon: '🏗️' }
+    { id: 'flete', name: 'Flete', desc: 'S/ 45-80', icon: '🚛' }
   ];
 
   const isSearchFieldEmpty = activeSearchField 
@@ -1096,7 +1099,6 @@ export const ClientDashboard: React.FC = () => {
                     >
                       <span className="service-icon">{s.icon}</span>
                       <span className="service-name">{s.name}</span>
-                      <span className="service-price">{s.desc}</span>
                     </div>
                   ))}
                 </div>
@@ -1546,7 +1548,11 @@ export const ClientDashboard: React.FC = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span className="history-type-tag">
-                        {item.type === 'delivery' ? '📦 Delivery' : item.type === 'taxi' ? '🚗 Taxi' : '🛵 Mototaxi'}
+                        {item.type === 'delivery' ? '📦 Delivery' 
+                          : item.type === 'flete' ? '🚛 Flete' 
+                          : item.type === 'taxi' ? '🚗 Taxi' 
+                          : item.type === 'taxi_premium' ? '🚕 Taxi Premium' 
+                          : '🛵 Mototaxi'}
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{item.date}</span>
                     </div>
