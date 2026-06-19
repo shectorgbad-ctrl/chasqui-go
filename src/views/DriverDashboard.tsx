@@ -171,7 +171,7 @@ export const DriverDashboard: React.FC = () => {
         map: map,
         suppressMarkers: false,
         polylineOptions: {
-          strokeColor: '#C8FF29', // Lime green color
+          strokeColor: '#D4AF37', // Lime green color
           strokeWeight: 5
         }
       });
@@ -604,6 +604,7 @@ export const DriverDashboard: React.FC = () => {
 
   return (
     <div className="mobile-container dark-theme">
+      <div className="peru-bg-watermark tumi-sipan-bg"></div>
       {/* SIMULACIÓN DE RUTA ACTIVA (AQUÍ APARECE EL MAPA UNA VEZ ACEPTADO) */}
       {activeOrderSimulation && simulationStep > 0 && (
         <div className="driver-route-simulation-layout">
@@ -619,13 +620,13 @@ export const DriverDashboard: React.FC = () => {
                     position: 'absolute', 
                     top: '72px', 
                     right: '12px', 
-                    backgroundColor: 'rgba(200, 255, 41, 0.1)', 
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)', 
                     color: 'var(--accent-lime)', 
                     fontSize: '9px', 
                     fontWeight: '800', 
                     padding: '4px 8px', 
                     borderRadius: '20px', 
-                    border: '1px solid rgba(200, 255, 41, 0.2)',
+                    border: '1px solid rgba(212, 175, 55, 0.2)',
                     zIndex: 10
                   }}
                 >
@@ -785,7 +786,7 @@ export const DriverDashboard: React.FC = () => {
               </>
             ) : (
               <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(200, 255, 41, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
                   <CheckCircle size={28} />
                 </div>
                 <h3 style={{ fontSize: '16px', fontWeight: '800' }}>¡Viaje Completado con Éxito!</h3>
@@ -961,7 +962,7 @@ export const DriverDashboard: React.FC = () => {
           </div>
 
           <div className="view-body" style={{ padding: '16px 14px' }}>
-            <div className="wallet-card" style={{ backgroundColor: 'rgba(200, 255, 41, 0.05)', borderColor: 'var(--accent-lime)' }}>
+            <div className="wallet-card" style={{ backgroundColor: 'rgba(212, 175, 55, 0.05)', borderColor: 'var(--accent-lime)' }}>
               <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '800' }}>TOTAL ESTA SEMANA</span>
               <span style={{ fontSize: '28px', fontWeight: '800', color: 'var(--accent-lime)', marginTop: '4px' }}>S/ {driverState.earnings.toFixed(2)}</span>
               <button className="btn btn-primary btn-md" style={{ marginTop: '12px', height: '36px', fontSize: '12px' }} onClick={() => alert('Retiro procesado a tu Yape.')}>
@@ -999,7 +1000,7 @@ export const DriverDashboard: React.FC = () => {
                   { day: 'Dom', val: 100 }
                 ].map(d => (
                   <div key={d.day} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: '100%', height: `${d.val}px`, backgroundColor: d.day === 'Dom' ? 'var(--accent-lime)' : 'rgba(200, 255, 41, 0.3)', borderRadius: '4px' }} />
+                    <div style={{ width: '100%', height: `${d.val}px`, backgroundColor: d.day === 'Dom' ? 'var(--accent-lime)' : 'rgba(212, 175, 55, 0.3)', borderRadius: '4px' }} />
                     <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{d.day}</span>
                   </div>
                 ))}
@@ -1124,7 +1125,7 @@ export const DriverDashboard: React.FC = () => {
 
               {/* Comentarios o Notas especiales */}
               {selectedOrderForDetail.comment && (
-                <div style={{ backgroundColor: 'rgba(200, 255, 41, 0.05)', borderLeft: '3px solid var(--accent-lime)', padding: '10px 12px', borderRadius: '4px', fontSize: '11.5px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                <div style={{ backgroundColor: 'rgba(212, 175, 55, 0.05)', borderLeft: '3px solid var(--accent-lime)', padding: '10px 12px', borderRadius: '4px', fontSize: '11.5px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
                   <strong>Nota del cliente:</strong> {selectedOrderForDetail.comment}
                 </div>
               )}
@@ -1248,7 +1249,7 @@ export const DriverDashboard: React.FC = () => {
                         flex: 1, 
                         borderColor: filterRadius === r ? 'var(--accent-lime)' : 'var(--border-color)',
                         color: filterRadius === r ? 'var(--accent-lime)' : 'var(--text-primary)',
-                        backgroundColor: filterRadius === r ? 'rgba(200, 255, 41, 0.05)' : 'var(--bg-card)'
+                        backgroundColor: filterRadius === r ? 'rgba(212, 175, 55, 0.05)' : 'var(--bg-card)'
                       }}
                       onClick={() => setFilterRadius(r)}
                     >
@@ -1557,7 +1558,7 @@ export const DriverDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'inicio' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'inicio' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'inicio' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'inicio' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -1581,7 +1582,7 @@ export const DriverDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'ganancias' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'ganancias' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'ganancias' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'ganancias' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -1657,7 +1658,7 @@ export const DriverDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'perfil' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'perfil' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'perfil' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'perfil' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -1706,7 +1707,7 @@ export const DriverDashboard: React.FC = () => {
                     justifyContent: 'space-between',
                     padding: '0 16px',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(200, 255, 41, 0.15)'
+                    boxShadow: '0 4px 10px rgba(212, 175, 55, 0.15)'
                   }}
                 >
                   <span>Modo conductor</span>

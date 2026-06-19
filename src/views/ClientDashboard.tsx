@@ -134,7 +134,7 @@ export const ClientDashboard: React.FC = () => {
         map: map,
         suppressMarkers: false,
         polylineOptions: {
-          strokeColor: '#C8FF29', // Lime green color
+          strokeColor: '#D4AF37', // Lime green color
           strokeWeight: 5
         }
       });
@@ -766,6 +766,7 @@ export const ClientDashboard: React.FC = () => {
 
   return (
     <div className="mobile-container dark-theme">
+      <div className="peru-bg-watermark nazca-lines-bg"></div>
       {/* PANTALLA INICIO */}
       {activeTab === 'inicio' && (
         <div className="client-dashboard-layout">
@@ -791,13 +792,13 @@ export const ClientDashboard: React.FC = () => {
                     position: 'absolute', 
                     top: '72px', 
                     right: '12px', 
-                    backgroundColor: 'rgba(200, 255, 41, 0.1)', 
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)', 
                     color: 'var(--accent-lime)', 
                     fontSize: '9px', 
                     fontWeight: '800', 
                     padding: '4px 8px', 
                     borderRadius: '20px', 
-                    border: '1px solid rgba(200, 255, 41, 0.2)',
+                    border: '1px solid rgba(212, 175, 55, 0.2)',
                     zIndex: 10
                   }}
                 >
@@ -1507,7 +1508,7 @@ export const ClientDashboard: React.FC = () => {
           {/* VIAJE COMPLETADO / FEEDBACK */}
           {clientState.status === 'completed' && (
             <div className="client-overlay-panel" style={{ textAlign: 'center' }}>
-              <div style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'rgba(200, 255, 41, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+              <div style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
                 <CheckCircle size={28} />
               </div>
               <h3 style={{ fontSize: '16px', fontWeight: '800' }}>¡Mandado Completado!</h3>
@@ -2048,7 +2049,7 @@ export const ClientDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'inicio' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'inicio' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'inicio' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'inicio' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -2072,7 +2073,7 @@ export const ClientDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'historial' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'historial' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'historial' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'historial' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -2148,7 +2149,7 @@ export const ClientDashboard: React.FC = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   color: activeTab === 'perfil' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'perfil' ? 'rgba(200, 255, 41, 0.08)' : 'transparent',
+                  backgroundColor: activeTab === 'perfil' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
                   fontWeight: activeTab === 'perfil' ? '700' : '500',
                   fontSize: '13.5px',
                   transition: 'all 0.2s'
@@ -2197,7 +2198,7 @@ export const ClientDashboard: React.FC = () => {
                     justifyContent: 'space-between',
                     padding: '0 16px',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(200, 255, 41, 0.15)'
+                    boxShadow: '0 4px 10px rgba(212, 175, 55, 0.15)'
                   }}
                 >
                   <span>Modo pasajero</span>

@@ -7,10 +7,15 @@
   --bg-input: #27272A;
   --bg-tertiary: #2A2A2E;
   
-  --accent-lime: #C8FF29;
-  --accent-lime-hover: #b5e622;
-  --accent-lime-light: rgba(200, 255, 41, 0.1);
-  --accent-lime-border: rgba(200, 255, 41, 0.3);
+  --accent-gold: #D4AF37; /* Oro Incaico */
+  --accent-gold-hover: #C59B27;
+  --accent-gold-light: rgba(212, 175, 55, 0.12);
+  --accent-gold-border: rgba(212, 175, 55, 0.35);
+
+  --accent-lime: var(--accent-gold);
+  --accent-lime-hover: var(--accent-gold-hover);
+  --accent-lime-light: var(--accent-gold-light);
+  --accent-lime-border: var(--accent-gold-border);
   
   --text-primary: #FFFFFF;
   --text-secondary: #8F909A;
@@ -2283,7 +2288,7 @@ body {
 }
 
 .pac-matched {
-  color: #C8FF29 !important;
+  color: #D4AF37 !important;
 }
 
 .pac-icon {
@@ -2415,5 +2420,36 @@ body {
   font-size: 15px;
   padding: 14px;
   border-radius: 14px;
+}
+
+/* Watermark Backgrounds */
+.peru-bg-watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.machu-picchu-bg {
+  background-image: url('/images/peru_machu_picchu.png');
+}
+
+.nazca-lines-bg {
+  background-image: url('/images/peru_nazca_lines.png');
+}
+
+.tumi-sipan-bg {
+  background-image: url('/images/peru_tumi_sipan.png');
+}
+
+.quipu-huaco-bg {
+  background-image: url('/images/peru_quipu_huaco.png');
 }
 

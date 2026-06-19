@@ -36,19 +36,19 @@ export const Welcome: React.FC = () => {
     {
       title: 'Llega a donde quieres',
       subtitle: 'Mototaxi, taxi, delivery y más. Todo en una sola app diseñada para el Perú.',
-      icon: <MapPin size={48} className="slide-icon-main" style={{ color: '#C8FF29' }} />,
+      icon: <MapPin size={48} className="slide-icon-main" style={{ color: 'var(--accent-lime)' }} />,
       btnText: 'Siguiente'
     },
     {
       title: 'Envíos al instante',
       subtitle: 'Envía paquetes express a cualquier punto de Lima y provincias con seguimiento en tiempo real.',
-      icon: <Box size={48} className="slide-icon-main" style={{ color: '#C8FF29' }} />,
+      icon: <Box size={48} className="slide-icon-main" style={{ color: 'var(--accent-lime)' }} />,
       btnText: 'Siguiente'
     },
     {
       title: 'Gana más conduciendo',
       subtitle: 'Únete como conductor o repartidor. Recibe pedidos cerca de ti y retira tus ganancias al instante.',
-      icon: <TrendingUp size={48} className="slide-icon-main" style={{ color: '#C8FF29' }} />,
+      icon: <TrendingUp size={48} className="slide-icon-main" style={{ color: 'var(--accent-lime)' }} />,
       btnText: 'Crear cuenta gratis'
     }
   ];
@@ -116,6 +116,7 @@ export const Welcome: React.FC = () => {
 
   return (
     <div className="mobile-container dark-theme">
+      <div className="peru-bg-watermark machu-picchu-bg"></div>
       {/* 1. SLIDES DE ONBOARDING */}
       {step === 'welcome' && (
         <div className="onboarding-layout">

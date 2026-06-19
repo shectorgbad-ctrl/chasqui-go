@@ -123,6 +123,7 @@ export const DocumentVerification: React.FC = () => {
 
   return (
     <div className="mobile-container dark-theme">
+      <div className="peru-bg-watermark quipu-huaco-bg"></div>
       <div className="view-layout">
         <div className="view-header">
           <button className="back-btn" onClick={logout}>
@@ -137,7 +138,7 @@ export const DocumentVerification: React.FC = () => {
 
         <div className="view-body">
           <div style={{ textAlign: 'center', margin: '10px 0 20px 0' }}>
-            <div style={{ width: '54px', height: '54px', borderRadius: '50%', backgroundColor: 'rgba(200, 255, 41, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+            <div style={{ width: '54px', height: '54px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: 'var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
               <ShieldCheck size={30} />
             </div>
             <h2 className="view-title">Verificación Legal</h2>
