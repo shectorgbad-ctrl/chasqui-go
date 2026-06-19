@@ -2150,14 +2150,6 @@ export const ClientDashboard: React.FC = () => {
           </div>
 
           <div 
-            className={`nav-tab ${activeTab === 'billetera' ? 'active' : ''}`}
-            onClick={() => setActiveTab('billetera')}
-          >
-            <CreditCard size={18} />
-            <span>Billetera</span>
-          </div>
-
-          <div 
             className={`nav-tab ${activeTab === 'perfil' ? 'active' : ''}`}
             onClick={() => setActiveTab('perfil')}
           >
