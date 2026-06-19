@@ -1867,7 +1867,20 @@ export const ClientDashboard: React.FC = () => {
                   <span className="summary-chevron">▼</span>
                 </summary>
                 <div className="security-details-content">
-                  Mantenemos altos estándares de limpieza e higiene en cada viaje. El uso de cinturón de seguridad, ventilación adecuada y una conducción defensiva y respetuosa son obligatorios.
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>1. COINCIDENCIA DE DATOS Y VEHÍCULO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Asegúrate de que la identidad del conductor y las características del vehículo coincidan con los datos mostrados en la aplicación. Si notas diferencias, cancela el viaje de inmediato y notifícalo a Soporte.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>2. PRECISIÓN EN EL PUNTO DE RECOGIDA</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Añade notas específicas a tu punto de recogida o selecciónalo detalladamente sobre el mapa interactivo. Esto ayuda a los conductores a encontrarte de forma más ágil y rápida.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>3. RESPETO MUTUO Y PRIVACIDAD EN RUTA</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Mantén una conducta respetuosa, evitando preguntas íntimas o distracciones al conductor. Además, comunícate siempre usando el chat interno de la app para proteger tu información de contacto.</span>
+                    </div>
+                  </div>
                 </div>
               </details>
 
