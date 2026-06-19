@@ -86,6 +86,15 @@ export const ClientDashboard: React.FC = () => {
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const formatHeaderAddress = (address: string) => {
+    if (!address || address === 'Obteniendo GPS...') return 'Obteniendo GPS...';
+    const parts = address.split(',');
+    if (parts.length >= 2) {
+      return `${parts[0].trim()}, ${parts[1].trim()}`;
+    }
+    return address;
+  };
+
   // 1. Google Maps Script Loader
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -970,9 +979,24 @@ export const ClientDashboard: React.FC = () => {
                 >
                   <Menu size={20} />
                 </button>
-                <div className="location-selector" style={{ flexGrow: 1, margin: 0, width: 'auto' }}>
-                  <MapPin size={15} style={{ color: 'var(--accent-lime)' }} />
-                  <span>Ubicación actual: <strong>Miraflores, Lima</strong></span>
+                <div 
+                  className="location-selector" 
+                  style={{ 
+                    flexGrow: 1, 
+                    margin: 0, 
+                    width: 'auto',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <MapPin size={15} style={{ color: 'var(--accent-lime)', flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    Ubicación actual: <strong>{formatHeaderAddress(clientState.origin)}</strong>
+                  </span>
                 </div>
               </div>
             )}
