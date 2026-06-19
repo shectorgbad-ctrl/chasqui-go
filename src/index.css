@@ -862,7 +862,8 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 12px 18px;
+  padding: 0;
+  padding-right: 18px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -870,6 +871,8 @@ body {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  height: 108px;
 }
 
 .service-card:hover {
@@ -884,22 +887,33 @@ body {
 }
 
 .service-card-img-container {
-  width: 96px;
-  height: 96px;
-  border-radius: 12px;
-  background-color: rgba(0, 0, 0, 0.25);
+  width: 110px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid var(--border-color);
+  position: relative;
+}
+
+.service-card.active .service-card-img-container {
+  border-right-color: var(--accent-lime);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .service-card-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  transform: scale(1.4);
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-card-img {
+  transform: scale(1.5);
 }
 
 .service-card-info {
