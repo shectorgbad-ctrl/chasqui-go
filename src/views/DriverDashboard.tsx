@@ -20,7 +20,8 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
-  ChevronRight
+  ChevronRight,
+  Navigation
 } from 'lucide-react';
 
 const darkMapStyles = [
@@ -66,6 +67,39 @@ export const DriverDashboard: React.FC = () => {
       return `${parts[0].trim()}, ${parts[1].trim()}`;
     }
     return address;
+  };
+
+  const [preferredNavigationApp, setPreferredNavigationApp] = useState<'google_maps' | 'waze'>(() => {
+    return (localStorage.getItem('preferred_navigation_app') as 'google_maps' | 'waze') || 'google_maps';
+  });
+
+  const handleSetNavigationApp = (app: 'google_maps' | 'waze') => {
+    setPreferredNavigationApp(app);
+    localStorage.setItem('preferred_navigation_app', app);
+  };
+
+  const handleOpenExternalNavigation = () => {
+    if (!activeOrderSimulation) return;
+    
+    let destinationAddress = activeOrderSimulation.destination;
+    if (destinationAddress.includes(' ||| ')) {
+      destinationAddress = destinationAddress.split(' ||| ')[0];
+    }
+    
+    const targetAddress = simulationStep === 1 
+      ? activeOrderSimulation.origin 
+      : destinationAddress;
+
+    const encodedAddress = encodeURIComponent(targetAddress);
+    
+    let url = '';
+    if (preferredNavigationApp === 'waze') {
+      url = `https://waze.com/ul?q=${encodedAddress}&navigate=yes`;
+    } else {
+      url = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
+    }
+    
+    window.open(url, '_blank');
   };
 
   // Filter states (Destino Preferido y Radio)
@@ -735,6 +769,33 @@ export const DriverDashboard: React.FC = () => {
               </>
             )}
 
+            {/* Botón flotante para Navegación Externa */}
+            <button
+              onClick={handleOpenExternalNavigation}
+              style={{
+                position: 'absolute',
+                bottom: '12px',
+                right: '12px',
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                backgroundColor: '#1E1E20',
+                border: '2px solid var(--accent-lime)',
+                color: 'var(--accent-lime)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)',
+                zIndex: 100,
+                transition: 'transform 0.2s',
+              }}
+              className="nav-app-btn"
+              title="Abrir navegador externo"
+            >
+              <Navigation size={22} style={{ fill: 'currentColor' }} />
+            </button>
+
             {/* Indicador de Estado Superior */}
             <div className="floating-header" style={{ width: '90%', zIndex: 10 }}>
               <div className="trip-stage-banner">
@@ -1095,6 +1156,61 @@ export const DriverDashboard: React.FC = () => {
                   <span style={{ color: 'var(--accent-lime)', fontWeight: '700' }}>{doc.status}</span>
                 </div>
               ))}
+            </div>
+
+            <span className="section-title" style={{ marginTop: '18px', display: 'block' }}>APLICATIVO DE NAVEGACIÓN</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '10px 12px', 
+                  backgroundColor: 'var(--bg-secondary)', 
+                  border: '1px solid var(--border-color)', 
+                  borderRadius: '8px', 
+                  cursor: 'pointer',
+                  borderColor: preferredNavigationApp === 'google_maps' ? 'var(--accent-lime)' : 'var(--border-color)'
+                }}
+                onClick={() => handleSetNavigationApp('google_maps')}
+              >
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '20px' }}>🗺️</span>
+                  <span style={{ fontSize: '12.5px', fontWeight: '700' }}>Google Maps</span>
+                </div>
+                <input 
+                  type="radio" 
+                  checked={preferredNavigationApp === 'google_maps'} 
+                  onChange={() => handleSetNavigationApp('google_maps')} 
+                  style={{ accentColor: 'var(--accent-lime)' }}
+                />
+              </div>
+
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '10px 12px', 
+                  backgroundColor: 'var(--bg-secondary)', 
+                  border: '1px solid var(--border-color)', 
+                  borderRadius: '8px', 
+                  cursor: 'pointer',
+                  borderColor: preferredNavigationApp === 'waze' ? 'var(--accent-lime)' : 'var(--border-color)'
+                }}
+                onClick={() => handleSetNavigationApp('waze')}
+              >
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '20px' }}>🚙</span>
+                  <span style={{ fontSize: '12.5px', fontWeight: '700' }}>Waze</span>
+                </div>
+                <input 
+                  type="radio" 
+                  checked={preferredNavigationApp === 'waze'} 
+                  onChange={() => handleSetNavigationApp('waze')} 
+                  style={{ accentColor: 'var(--accent-lime)' }}
+                />
+              </div>
             </div>
 
             <div className="menu-list-group" style={{ marginTop: '24px' }}>
