@@ -18,7 +18,6 @@ import {
   CheckCircle,
   Menu,
   Shield,
-  Settings,
   HelpCircle,
   Bell,
   Car,
@@ -2491,29 +2490,7 @@ export const ClientDashboard: React.FC = () => {
                 <span>Seguridad</span>
               </div>
 
-              <div 
-                className={`drawer-menu-item ${activeTab === 'perfil' ? 'active' : ''}`} 
-                onClick={() => { 
-                  setIsDrawerOpen(false); 
-                  setActiveTab('perfil'); 
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  color: activeTab === 'perfil' ? 'var(--text-primary)' : '#8F909A',
-                  backgroundColor: activeTab === 'perfil' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
-                  fontWeight: activeTab === 'perfil' ? '700' : '500',
-                  fontSize: '13.5px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Settings size={18} style={{ color: activeTab === 'perfil' ? 'var(--accent-lime)' : '#8F909A' }} />
-                <span>Configuración</span>
-              </div>
+
 
               <div 
                 className="drawer-menu-item"
