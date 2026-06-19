@@ -43,7 +43,7 @@ const darkMapStyles = [
 
 export const ClientDashboard: React.FC = () => {
   const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder, originCoords, setOriginCoords, hasRealGPSLocation, setHasRealGPSLocation } = useApp();
-  const [activeTab, setActiveTab] = useState<'inicio' | 'historial' | 'billetera' | 'perfil'>('inicio');
+  const [activeTab, setActiveTab] = useState<'inicio' | 'historial' | 'billetera' | 'perfil' | 'seguridad'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
 
@@ -1726,6 +1726,268 @@ export const ClientDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* PANTALLA SEGURIDAD (SOLICITADA POR EL USUARIO) */}
+      {activeTab === 'seguridad' && (
+        <div className="view-layout">
+          {/* Cabecera de pantalla */}
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              onClick={() => setActiveTab('inicio')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--accent-lime)',
+                cursor: 'pointer',
+                fontSize: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px'
+              }}
+            >
+              ⬅️
+            </button>
+            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800' }}>Seguridad</h2>
+          </div>
+
+          <div className="view-body" style={{ padding: '16px 14px', overflowY: 'auto', height: 'calc(100% - 60px)' }}>
+            
+            {/* Tarjetas de Acción Superior */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+              <div 
+                style={{
+                  flex: 1,
+                  backgroundColor: '#1E1E20',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>💬</span>
+                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Soporte</span>
+              </div>
+              <div 
+                style={{
+                  flex: 1,
+                  backgroundColor: '#1E1E20',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>👥</span>
+                <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF', textAlign: 'center' }}>Contactos de emergencia</span>
+              </div>
+            </div>
+
+            {/* Botón de Emergencia (Pánico) */}
+            <button 
+              onClick={() => {
+                if (confirm('¿Deseas realizar una llamada de emergencia al 105 (Policía Nacional)?')) {
+                  window.open('tel:105');
+                }
+              }}
+              style={{
+                width: '100%',
+                backgroundColor: '#DC2626',
+                border: 'none',
+                borderRadius: '14px',
+                padding: '14px',
+                color: '#FFFFFF',
+                fontSize: '15px',
+                fontWeight: '800',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                marginBottom: '24px',
+                boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)'
+              }}
+            >
+              <span>🚨</span> Llamar al 105
+            </button>
+
+            {/* Sección Informativa: Cómo estás protegido */}
+            <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '14px' }}>
+              Cómo estás protegido
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              
+              {/* Tarjeta 1 */}
+              <div style={{
+                backgroundColor: '#1E1E20',
+                border: '1px solid var(--border-color)',
+                borderRadius: '14px',
+                padding: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  color: 'var(--accent-lime)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0
+                }}>
+                  🛡️
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Soporte de seguridad proactivo</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Monitoreo GPS constante de tu ruta y alertas de desvíos inusuales.</span>
+                </div>
+              </div>
+
+              {/* Tarjeta 2 */}
+              <div style={{
+                backgroundColor: '#1E1E20',
+                border: '1px solid var(--border-color)',
+                borderRadius: '14px',
+                padding: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  color: 'var(--accent-lime)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0
+                }}>
+                  🪪
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Verificación de conductores</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Filtro riguroso de antecedentes penales, licencia y revisión ocular del vehículo.</span>
+                </div>
+              </div>
+
+              {/* Tarjeta 3 */}
+              <div style={{
+                backgroundColor: '#1E1E20',
+                border: '1px solid var(--border-color)',
+                borderRadius: '14px',
+                padding: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  color: 'var(--accent-lime)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0
+                }}>
+                  📞
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Proteger la privacidad</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Enmascaramiento de números telefónicos en las llamadas entre conductor y pasajero.</span>
+                </div>
+              </div>
+
+              {/* Tarjeta 4 */}
+              <div style={{
+                backgroundColor: '#1E1E20',
+                border: '1px solid var(--border-color)',
+                borderRadius: '14px',
+                padding: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  color: 'var(--accent-lime)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0
+                }}>
+                  🎗️
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Mantener la seguridad en todos los viajes</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Políticas de uso obligatorio de cinturón de seguridad y normas de higiene.</span>
+                </div>
+              </div>
+
+              {/* Tarjeta 5 */}
+              <div style={{
+                backgroundColor: '#1E1E20',
+                border: '1px solid var(--border-color)',
+                borderRadius: '14px',
+                padding: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  color: 'var(--accent-lime)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0
+                }}>
+                  ⚠️
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FFFFFF' }}>Accidentes: pasos a seguir</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Guía de auxilio rápido y activación del seguro contra accidentes personales (SOAT).</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* MODAL BUSCADOR DE DESTINO */}
       {showSearchModal && (
         <div className="modal-overlay">
@@ -2317,7 +2579,11 @@ export const ClientDashboard: React.FC = () => {
               </div>
 
               <div 
-                className="drawer-menu-item"
+                className={`drawer-menu-item ${activeTab === 'seguridad' ? 'active' : ''}`} 
+                onClick={() => { 
+                  setIsDrawerOpen(false); 
+                  setActiveTab('seguridad'); 
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -2325,12 +2591,14 @@ export const ClientDashboard: React.FC = () => {
                   padding: '12px 14px',
                   borderRadius: '10px',
                   cursor: 'pointer',
-                  color: '#8F909A',
-                  fontWeight: '500',
-                  fontSize: '13.5px'
+                  color: activeTab === 'seguridad' ? 'var(--text-primary)' : '#8F909A',
+                  backgroundColor: activeTab === 'seguridad' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
+                  fontWeight: activeTab === 'seguridad' ? '700' : '500',
+                  fontSize: '13.5px',
+                  transition: 'all 0.2s'
                 }}
               >
-                <Shield size={18} />
+                <Shield size={18} style={{ color: activeTab === 'seguridad' ? 'var(--accent-lime)' : '#8F909A' }} />
                 <span>Seguridad</span>
               </div>
 
