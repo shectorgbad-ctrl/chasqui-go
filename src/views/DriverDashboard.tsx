@@ -59,6 +59,15 @@ export const DriverDashboard: React.FC = () => {
   const [selectedOrderForDetail, setSelectedOrderForDetail] = useState<any | null>(null);
   const [bidPrice, setBidPrice] = useState<number>(0);
 
+  const formatTripAddress = (address: string) => {
+    if (!address || address === 'Obteniendo GPS...') return 'Obteniendo GPS...';
+    const parts = address.split(',');
+    if (parts.length >= 2) {
+      return `${parts[0].trim()}, ${parts[1].trim()}`;
+    }
+    return address;
+  };
+
   // Filter states (Destino Preferido y Radio)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
   const [isFilterActive, setIsFilterActive] = useState<boolean>(false);
@@ -756,16 +765,55 @@ export const DriverDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="trip-locations-box" style={{ width: '100%', marginTop: '12px', backgroundColor: 'var(--bg-secondary)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '11.5px' }}>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <span style={{ color: 'var(--accent-lime)' }}>●</span>
-                    <span>Recojo: <strong>{activeOrderSimulation.pickupTitle}</strong></span>
+                <div className="trip-locations-box" style={{ width: '100%', marginTop: '12px', backgroundColor: 'var(--bg-secondary)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                    <span style={{ color: 'var(--accent-lime)', marginTop: '3px' }}>●</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--text-secondary)', fontWeight: '700' }}>PUNTO DE RECOJO:</span>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '12px' }}>{activeOrderSimulation.origin}</strong>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
-                    <span style={{ color: '#EF4444' }}>●</span>
-                    <span>Entrega: <strong>{activeOrderSimulation.destination.split(',')[0]}</strong></span>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
+                    <span style={{ color: '#EF4444', marginTop: '3px' }}>●</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--text-secondary)', fontWeight: '700' }}>DESTINO DE ENTREGA:</span>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '12px' }}>{activeOrderSimulation.destination}</strong>
+                    </div>
                   </div>
                 </div>
+
+                {/* Detalles del paquete/envío */}
+                {(activeOrderSimulation.category || activeOrderSimulation.comment || activeOrderSimulation.pickupPhone || activeOrderSimulation.deliveryPhone) && (
+                  <div style={{ width: '100%', marginTop: '10px', backgroundColor: 'rgba(212, 175, 55, 0.05)', padding: '10px 12px', borderRadius: '8px', border: '1px dashed var(--border-color)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--accent-lime)', fontWeight: '800', letterSpacing: '0.5px' }}>DETALLES DEL ENVÍO</span>
+                    {activeOrderSimulation.category && (
+                      <div>
+                        📦 <strong>Categoría:</strong> {
+                          activeOrderSimulation.category === 'alimentos' ? '🍔 Alimentos' : 
+                          activeOrderSimulation.category === 'ropa' ? '👕 Ropa' : 
+                          activeOrderSimulation.category === 'documentos' ? '📄 Documentos' : 
+                          activeOrderSimulation.category === 'medicinas' ? '💊 Prod. Farmacéuticos' : 
+                          activeOrderSimulation.category
+                        }
+                      </div>
+                    )}
+                    {activeOrderSimulation.comment && (
+                      <div style={{ fontStyle: 'italic' }}>
+                        💬 <strong>Indicaciones:</strong> "{activeOrderSimulation.comment}"
+                      </div>
+                    )}
+                    {(activeOrderSimulation.pickupPhone || activeOrderSimulation.deliveryPhone) && (
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '6px', marginTop: '2px' }}>
+                        {activeOrderSimulation.pickupPhone && (
+                          <span>📞 <strong>Recojo:</strong> <a href={`tel:${activeOrderSimulation.pickupPhone}`} style={{ color: 'var(--accent-lime)', textDecoration: 'none', fontWeight: 'bold' }}>{activeOrderSimulation.pickupPhone}</a></span>
+                        )}
+                        {activeOrderSimulation.deliveryPhone && (
+                          <span>📞 <strong>Entrega:</strong> <a href={`tel:${activeOrderSimulation.deliveryPhone}`} style={{ color: 'var(--accent-lime)', textDecoration: 'none', fontWeight: 'bold' }}>{activeOrderSimulation.deliveryPhone}</a></span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', width: '100%', marginTop: '12px', fontSize: '11px', color: 'var(--text-secondary)', textAlign: 'center' }}>
                   <div className="stat-mini-card">
@@ -894,13 +942,13 @@ export const DriverDashboard: React.FC = () => {
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', fontSize: '12.5px', lineHeight: '1.3' }}>
                               <span style={{ color: 'var(--accent-lime)', marginTop: '3px' }}>●</span>
                               <span style={{ color: 'var(--text-secondary)' }}>
-                                Recojo: <strong style={{ color: 'var(--text-primary)' }}>{order.pickupTitle}</strong>
+                                Recojo: <strong style={{ color: 'var(--text-primary)' }}>{formatTripAddress(order.origin)}</strong>
                               </span>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', fontSize: '12.5px', lineHeight: '1.3' }}>
                               <span style={{ color: '#EF4444', marginTop: '3px' }}>●</span>
                               <span style={{ color: 'var(--text-secondary)' }}>
-                                Entrega: <strong style={{ color: 'var(--text-primary)' }}>{order.destination.split(',')[0]}</strong>
+                                Entrega: <strong style={{ color: 'var(--text-primary)' }}>{formatTripAddress(order.destination)}</strong>
                               </span>
                             </div>
                           </div>

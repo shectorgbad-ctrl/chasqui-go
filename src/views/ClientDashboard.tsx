@@ -492,6 +492,10 @@ export const ClientDashboard: React.FC = () => {
       alert('Por favor, selecciona un tipo de servicio primero.');
       return;
     }
+    if (!clientState.origin || clientState.origin === 'Obteniendo GPS...') {
+      alert('Aún estamos obteniendo tu ubicación GPS. Por favor, espera un momento o selecciona una dirección de recojo manual.');
+      return;
+    }
     placeRealOrder(priceOffer, {
       pickupPhone,
       deliveryPhone,
@@ -1502,14 +1506,14 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="trip-locations-box" style={{ width: '100%', marginTop: '12px', backgroundColor: 'var(--bg-secondary)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '11.5px' }}>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--accent-lime)' }}>●</span>
-                  <span>Recojo: <strong>{clientState.origin.split(',')[0]}</strong></span>
+              <div className="trip-locations-box" style={{ width: '100%', marginTop: '12px', backgroundColor: 'var(--bg-secondary)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--accent-lime)', marginTop: '3px' }}>●</span>
+                  <span>Recojo: <strong>{formatHeaderAddress(clientState.origin)}</strong></span>
                 </div>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
-                  <span style={{ color: '#EF4444' }}>●</span>
-                  <span>Entrega: <strong>{clientState.destination.split(',')[0]}</strong></span>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                  <span style={{ color: '#EF4444', marginTop: '3px' }}>●</span>
+                  <span>Entrega: <strong>{formatHeaderAddress(clientState.destination)}</strong></span>
                 </div>
               </div>
 
