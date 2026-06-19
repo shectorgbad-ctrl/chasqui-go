@@ -2142,14 +2142,6 @@ export const ClientDashboard: React.FC = () => {
           </div>
 
           <div 
-            className={`nav-tab ${activeTab === 'historial' ? 'active' : ''}`}
-            onClick={() => setActiveTab('historial')}
-          >
-            <History size={18} />
-            <span>Historial</span>
-          </div>
-
-          <div 
             className={`nav-tab ${activeTab === 'perfil' ? 'active' : ''}`}
             onClick={() => setActiveTab('perfil')}
           >
