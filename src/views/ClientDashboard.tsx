@@ -79,6 +79,11 @@ export const ClientDashboard: React.FC = () => {
   const [deliveryCategory, setDeliveryCategory] = useState<'alimentos' | 'ropa' | 'documentos' | 'medicinas' | null>(null);
   const [courierComments, setCourierComments] = useState('');
 
+  // Mudanza/Carga specific states
+  const [requiresHelper, setRequiresHelper] = useState<'con_ayudante' | 'sin_ayudante'>('sin_ayudante');
+  const [isScheduled, setIsScheduled] = useState<boolean>(false);
+  const [scheduledTime, setScheduledTime] = useState<string>('');
+
   // Search stages (radar or driver offers)
   const [searchingStage, setSearchingStage] = useState<'radar' | 'driver_offers'>('radar');
   const [autoAccept, setAutoAccept] = useState<boolean>(false);
@@ -497,11 +502,22 @@ export const ClientDashboard: React.FC = () => {
       return;
     }
     const isTaxiService = clientState.service === 'taxi' || clientState.service === 'taxi_premium';
+    const isFleteService = clientState.service === 'flete';
+
+    let finalComment = courierComments;
+    if (isFleteService) {
+      const helperText = requiresHelper === 'con_ayudante' ? 'Con ayudante' : 'Sin ayudante';
+      const scheduleText = isScheduled 
+        ? `Programado: ${scheduledTime ? new Date(scheduledTime).toLocaleString('es-PE') : 'No especificado'}` 
+        : 'Inmediato (Ahora)';
+      finalComment = `[Mudanza/Carga] Ayudante: ${helperText} | Horario: ${scheduleText}${courierComments ? ` | Notas: ${courierComments}` : ''}`;
+    }
+
     placeRealOrder(priceOffer, {
       pickupPhone: isTaxiService ? '' : pickupPhone,
       deliveryPhone: isTaxiService ? '' : deliveryPhone,
-      category: isTaxiService ? undefined : (deliveryCategory || undefined),
-      comment: courierComments || undefined
+      category: (isTaxiService || isFleteService) ? undefined : (deliveryCategory || undefined),
+      comment: finalComment || undefined
     });
   };
 
@@ -1859,7 +1875,7 @@ export const ClientDashboard: React.FC = () => {
               )}
 
               {/* ¿QUÉ VOY A ENTREGAR? */}
-              {clientState.service !== 'taxi' && clientState.service !== 'taxi_premium' && (
+              {clientState.service !== 'taxi' && clientState.service !== 'taxi_premium' && clientState.service !== 'flete' && (
                 <div style={{ marginTop: '20px' }}>
                   <span className="section-title" style={{ display: 'block', marginBottom: '8px' }}>¿QUÉ VOY A ENTREGAR?</span>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -1892,23 +1908,155 @@ export const ClientDashboard: React.FC = () => {
                 </div>
               )}
 
+              {/* ¿AYUDANTE PARA CARGA Y DESCARGA? (Solo para Mudanza / Carga) */}
+              {clientState.service === 'flete' && (
+                <div style={{ marginTop: '20px' }}>
+                  <span className="section-title" style={{ display: 'block', marginBottom: '8px' }}>¿AYUDANTE PARA CARGA Y DESCARGA?</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setRequiresHelper('con_ayudante')}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        borderRadius: '12px',
+                        border: '1px solid #27272A',
+                        backgroundColor: requiresHelper === 'con_ayudante' ? 'var(--accent-lime)' : '#1E1E20',
+                        color: requiresHelper === 'con_ayudante' ? '#000000' : '#FFFFFF',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>💪</span> Con ayudante
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRequiresHelper('sin_ayudante')}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        borderRadius: '12px',
+                        border: '1px solid #27272A',
+                        backgroundColor: requiresHelper === 'sin_ayudante' ? 'var(--accent-lime)' : '#1E1E20',
+                        color: requiresHelper === 'sin_ayudante' ? '#000000' : '#FFFFFF',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>🚫</span> Sin ayudante
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* PROGRAMAR HORARIO DE RECOJO (Solo para Mudanza / Carga) */}
+              {clientState.service === 'flete' && (
+                <div style={{ marginTop: '20px' }}>
+                  <span className="section-title" style={{ display: 'block', marginBottom: '8px' }}>PROGRAMAR HORARIO DE RECOJO</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setIsScheduled(false)}
+                        style={{
+                          flex: 1,
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: '1px solid #27272A',
+                          backgroundColor: !isScheduled ? 'var(--accent-lime)' : '#1E1E20',
+                          color: !isScheduled ? '#000000' : '#FFFFFF',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span>⚡</span> Inmediato (Ahora)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsScheduled(true)}
+                        style={{
+                          flex: 1,
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: '1px solid #27272A',
+                          backgroundColor: isScheduled ? 'var(--accent-lime)' : '#1E1E20',
+                          color: isScheduled ? '#000000' : '#FFFFFF',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span>📅</span> Programar
+                      </button>
+                    </div>
+                    {isScheduled && (
+                      <div className="animated fadeIn" style={{ animation: 'fadeIn 0.2s ease-out' }}>
+                        <input
+                          type="datetime-local"
+                          className="form-control"
+                          value={scheduledTime}
+                          onChange={(e) => setScheduledTime(e.target.value)}
+                          style={{
+                            width: '100%',
+                            height: '38px',
+                            backgroundColor: '#1E1E20',
+                            border: '1px solid #27272A',
+                            borderRadius: '8px',
+                            color: '#FFFFFF',
+                            padding: '0 12px',
+                            fontSize: '13px'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* COMENTARIOS PARA EL CONDUCTOR / REPARTIDOR */}
               <div style={{ 
                 marginTop: '20px', 
                 marginBottom: '12px',
-                borderTop: (clientState.service === 'taxi' || clientState.service === 'taxi_premium') ? '1px solid var(--border-color)' : 'none',
-                paddingTop: (clientState.service === 'taxi' || clientState.service === 'taxi_premium') ? '16px' : '0'
+                borderTop: (clientState.service === 'taxi' || clientState.service === 'taxi_premium' || clientState.service === 'flete') ? '1px solid var(--border-color)' : 'none',
+                paddingTop: (clientState.service === 'taxi' || clientState.service === 'taxi_premium' || clientState.service === 'flete') ? '16px' : '0'
               }}>
                 <label style={{ display: 'block', fontSize: '11px', color: '#8F909A', fontWeight: '700', marginBottom: '6px' }}>
                   {clientState.service === 'taxi' || clientState.service === 'taxi_premium' 
                     ? 'COMENTARIOS PARA EL CONDUCTOR' 
-                    : 'COMENTARIOS PARA EL REPARTIDOR'}
+                    : clientState.service === 'flete'
+                      ? 'COMENTARIOS ADICIONALES PARA LA MUDANZA'
+                      : 'COMENTARIOS PARA EL REPARTIDOR'}
                 </label>
                 <textarea
                   className="form-control"
                   placeholder={clientState.service === 'taxi' || clientState.service === 'taxi_premium'
                     ? "Ej. Llevar cambio de S/ 50, llamar al llegar, aire acondicionado..."
-                    : "Ej. Entregar en portería del edificio, tocar el timbre 302..."}
+                    : clientState.service === 'flete'
+                      ? "Ej. Indicar si hay ascensor, objetos frágiles o pesados (cama, ropero)..."
+                      : "Ej. Entregar en portería del edificio, tocar el timbre 302..."}
                   rows={2}
                   value={courierComments}
                   onChange={(e) => setCourierComments(e.target.value)}
