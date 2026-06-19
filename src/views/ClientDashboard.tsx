@@ -996,28 +996,57 @@ export const ClientDashboard: React.FC = () => {
             {/* Cabecera flotante */}
             {clientState.status !== 'searching' && (
               <div className="floating-header" style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '92%', left: '4%', right: '4%' }}>
-                <button 
-                  className="hamburger-menu-btn" 
-                  onClick={() => setIsDrawerOpen(true)}
-                  aria-label="Abrir menú"
-                  style={{
-                    backgroundColor: 'var(--bg-card)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-primary)',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)',
-                    backdropFilter: 'blur(8px)',
-                    flexShrink: 0
-                  }}
-                >
-                  <Menu size={20} />
-                </button>
+                {clientState.destination ? (
+                  <button 
+                    className="back-btn" 
+                    onClick={() => {
+                      handleCancelOrder();
+                      setDestinationInput('');
+                      setDestCoords(null);
+                    }}
+                    aria-label="Regresar al inicio"
+                    style={{
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)',
+                      backdropFilter: 'blur(8px)',
+                      flexShrink: 0
+                    }}
+                  >
+                    <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+                  </button>
+                ) : (
+                  <button 
+                    className="hamburger-menu-btn" 
+                    onClick={() => setIsDrawerOpen(true)}
+                    aria-label="Abrir menú"
+                    style={{
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)',
+                      backdropFilter: 'blur(8px)',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Menu size={20} />
+                  </button>
+                )}
                 <div 
                   className="location-selector" 
                   style={{ 

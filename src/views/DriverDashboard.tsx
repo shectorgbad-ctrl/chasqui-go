@@ -21,7 +21,8 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronRight,
-  Navigation
+  Navigation,
+  ArrowLeft
 } from 'lucide-react';
 
 const darkMapStyles = [
@@ -39,7 +40,7 @@ const darkMapStyles = [
 
 export const DriverDashboard: React.FC = () => {
   const { user, logout, switchRole, driverState, setDriverState, setStep, isPlaceholder } = useApp();
-  const [activeTab, setActiveTab] = useState<'inicio' | 'ganancias' | 'perfil'>('inicio');
+  const [activeTab, setActiveTab] = useState<'inicio' | 'ganancias' | 'perfil' | 'seguridad'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
 
@@ -1065,9 +1066,24 @@ export const DriverDashboard: React.FC = () => {
       {/* PANTALLA RENDIMIENTO/GANANCIAS */}
       {activeTab === 'ganancias' && (
         <div className="view-layout">
-          <div className="view-header" style={{ borderBottom: '1px solid var(--border-color)' }}>
-            <h2 className="view-title" style={{ fontSize: '17px', margin: 0 }}>Desempeño</h2>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Historial de tus ingresos como motorizado</span>
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <h2 className="view-title" style={{ fontSize: '16px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Desempeño</h2>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '500' }}>Historial de tus ingresos como motorizado</span>
+            </div>
           </div>
 
           <div className="view-body" style={{ padding: '16px 14px' }}>
@@ -1122,6 +1138,26 @@ export const DriverDashboard: React.FC = () => {
       {/* PANTALLA PERFIL */}
       {activeTab === 'perfil' && (
         <div className="view-layout">
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <h2 className="view-title" style={{ fontSize: '16px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Mi Cuenta</h2>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '500' }}>Configuración de tu perfil de conductor</span>
+            </div>
+          </div>
+
           <div className="view-body" style={{ padding: '24px 14px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '24px' }}>
               <div className="profile-avatar-large" style={{ borderColor: 'var(--accent-lime)' }}>
@@ -1233,6 +1269,182 @@ export const DriverDashboard: React.FC = () => {
                 <span>Cerrar sesión</span>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* PANTALLA SEGURIDAD */}
+      {activeTab === 'seguridad' && (
+        <div className="view-layout">
+          {/* Cabecera de pantalla */}
+          <div className="view-header" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)'
+          }}>
+            <button 
+              className="back-btn"
+              onClick={() => setActiveTab('inicio')}
+            >
+              <ArrowLeft size={18} style={{ color: 'var(--accent-lime)' }} />
+            </button>
+            <h2 className="view-title" style={{ fontSize: '18px', margin: 0, fontWeight: '800', fontFamily: 'var(--font-title)', color: 'var(--accent-gold)', letterSpacing: '1px', textTransform: 'uppercase' }}>Centro de Seguridad</h2>
+          </div>
+
+          <div className="view-body" style={{ padding: '16px 14px', overflowY: 'auto', height: 'calc(100% - 60px)' }}>
+            
+            {/* Escudo de Protección Inca */}
+            <div className="inka-shield-container">
+              <div className="inka-shield-outer-pulse">
+                <div className="inka-shield-glow">
+                  <div className="inka-shield-icon">🛡️</div>
+                </div>
+              </div>
+              <div className="inka-shield-text">
+                <h3 className="inka-shield-title">Protección Activa Inka</h3>
+                <p className="inka-shield-status">Monitoreo de ruta Chasqui Guard activado y resguardando tu trayecto 24/7</p>
+              </div>
+            </div>
+
+            {/* Cuadrícula de Acciones de Seguridad */}
+            <div className="security-grid-2x2">
+              {/* Llamada de Emergencia 105 */}
+              <div 
+                className="security-grid-card emergency" 
+                onClick={() => {
+                  if (window.confirm('¿Deseas realizar una llamada de emergencia al 105 (Policía Nacional)?')) {
+                    window.open('tel:105');
+                  }
+                }}
+              >
+                <div className="card-icon">🚨</div>
+                <div className="card-info">
+                  <span className="card-title">Ayuda 105</span>
+                  <span className="card-desc">Llamada de pánico directa a emergencias</span>
+                </div>
+              </div>
+
+              {/* Canal de Soporte */}
+              <div 
+                className="security-grid-card" 
+                onClick={() => alert('Conectando con el canal de soporte prioritario de Chasqui Go. Un asesor se comunicará contigo en breve.')}
+              >
+                <div className="card-icon">💬</div>
+                <div className="card-info">
+                  <span className="card-title">Soporte Inka</span>
+                  <span className="card-desc">Atención inmediata de incidencias</span>
+                </div>
+              </div>
+
+              {/* Contactos de Confianza */}
+              <div 
+                className="security-grid-card" 
+                onClick={() => alert('Accediendo a la configuración de tu Círculo de Contactos de Confianza para compartir tu viaje en tiempo real.')}
+              >
+                <div className="card-icon">👥</div>
+                <div className="card-info">
+                  <span className="card-title">Contactos</span>
+                  <span className="card-desc">Comparte tu ubicación con tu círculo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sección Informativa: Protocolos de Seguridad */}
+            <h3 className="security-section-title">
+              ¿Cómo garantizamos tu tranquilidad?
+            </h3>
+
+            <div className="security-accordion-container">
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">🪪</span>
+                  <span className="summary-text">Validación de los conductores por los E.</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>1. SELECCIÓN LIBRE DEL CONDUCTOR</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Antes de aceptar una oferta, tienes la libertad de revisar la calificación en estrellas del conductor y el número total de servicios completados de manera exitosa.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>2. SOCIOS VERIFICADOS Y ACTIVADOS</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Cada miembro del equipo debe aprobar un estricto proceso de admisión. Validamos licencias de conducir vigentes, antecedentes del conductor y la documentación reglamentaria del vehículo.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>3. FOTOGRAFÍA DE PERFIL EN VIVO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Para un reconocimiento rápido y seguro al abordar, exigimos selfies reales tomadas directamente durante el registro oficial, evitando cualquier tipo de suplantación de identidad.</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon" style={{ padding: '6px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+                      <path d="M3 5l18 14" />
+                      <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" stroke="none" />
+                      <path d="M12 9v6" stroke="var(--bg-card)" strokeWidth="1.5" />
+                    </svg>
+                  </span>
+                  <span className="summary-text">Protocolo de Confort y Bienestar</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>1. COINCIDENCIA DE DATOS Y VEHÍCULO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Asegúrate de que la identidad del conductor y las características del vehículo coincidan con los datos mostrados en la aplicación. Si notas diferencias, cancela el viaje de inmediato y notifícalo a Soporte.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>2. PRECISIÓN EN EL PUNTO DE RECOGIDA</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Añade notas específicas a tu punto de recogida o selecciónalo detalladamente sobre el mapa interactivo. Esto ayuda a los conductores a encontrarte de forma más ágil y rápida.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>3. RESPETO MUTUO Y PRIVACIDAD EN RUTA</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Mantén una conducta respetuosa, evitando preguntas íntimas o distracciones al conductor. Además, comunícate siempre usando el chat interno de la app para proteger tu información de contacto.</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details className="security-accordion">
+                <summary className="security-summary">
+                  <span className="summary-icon">⚠️</span>
+                  <span className="summary-text">Qué hacer en caso de un accidente</span>
+                  <span className="summary-chevron">▼</span>
+                </summary>
+                <div className="security-details-content">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 1: MANTÉN LA SERENIDAD Y EVALÚA LESIONES</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Conserva la tranquilidad y verifica inmediatamente el estado físico de todos los ocupantes del vehículo para comprobar si hay heridas.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 2: SOLICITA AUXILIO MÉDICO DE SER NECESARIO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Si hay personas afectadas, llama sin demora a una ambulancia o a los servicios de rescate y emergencias médicas locales.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 3: REPORTA EL SUCESO A LAS AUTORIDADES</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Informa el incidente de inmediato a la Policía Nacional para que acuda al lugar y se realice el informe policial reglamentario.</span>
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '11.5px', fontFamily: 'var(--font-title)' }}>PASO 4: COMUNÍCATE CON NUESTRO SOPORTE PRIORITARIO</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Escríbenos a <a href="mailto:soporte@chasquigo.com" style={{ color: 'var(--accent-gold)', textDecoration: 'underline' }}>soporte@chasquigo.com</a> o repórtalo en tiempo real usando el chat interactivo de asistencia de la aplicación.</span>
+                    </div>
+                    <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '10px', marginTop: '4px' }}>
+                      <strong style={{ display: 'block', color: 'var(--accent-gold)', marginBottom: '4px', fontSize: '12px', fontFamily: 'var(--font-title)', textAlign: 'center' }}>🛡️ VIAJE ASEGURADO DE PRINCIPIO A FIN</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', textAlign: 'center', fontStyle: 'italic' }}>En Chasqui Go tu tranquilidad es lo primero. Cada trayecto está respaldado por la cobertura completa del SOAT de principio a fin.</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+
           </div>
         </div>
       )}
@@ -1791,7 +2003,11 @@ export const DriverDashboard: React.FC = () => {
               </div>
 
               <div 
-                className="drawer-menu-item"
+                className={`drawer-menu-item ${activeTab === 'seguridad' ? 'active' : ''}`} 
+                onClick={() => { 
+                  setIsDrawerOpen(false); 
+                  setActiveTab('seguridad'); 
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1799,12 +2015,14 @@ export const DriverDashboard: React.FC = () => {
                   padding: '12px 14px',
                   borderRadius: '10px',
                   cursor: 'pointer',
-                  color: '#8F909A',
-                  fontWeight: '500',
-                  fontSize: '13.5px'
+                  color: activeTab === 'seguridad' ? 'var(--text-primary)' : '#8F909A',
+                  backgroundColor: activeTab === 'seguridad' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
+                  fontWeight: activeTab === 'seguridad' ? '700' : '500',
+                  fontSize: '13.5px',
+                  transition: 'all 0.2s'
                 }}
               >
-                <Shield size={18} />
+                <Shield size={18} style={{ color: activeTab === 'seguridad' ? 'var(--accent-lime)' : '#8F909A' }} />
                 <span>Seguridad</span>
               </div>
 
