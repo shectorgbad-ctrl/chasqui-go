@@ -1108,7 +1108,7 @@ export const ClientDashboard: React.FC = () => {
               {/* Barra de Búsqueda */}
               <div className="search-bar-trigger" onClick={() => setShowSearchModal(true)}>
                 <Search size={18} style={{ color: 'var(--text-secondary)' }} />
-                <span>¿A dónde enviamos hoy?</span>
+                <span>Lugar de destino</span>
                 <span className="search-btn-badge">Buscar</span>
               </div>
 
