@@ -1325,6 +1325,14 @@ export const ClientDashboard: React.FC = () => {
                 >
                   Aumentar tarifa
                 </button>
+
+                {/* Botón Cancelar Solicitud */}
+                <button 
+                  className="btn-cancel-request-sheet" 
+                  onClick={handleCancelOrder}
+                >
+                  ✕ Cancelar solicitud
+                </button>
               </div>
 
               {/* Fila inferior flotante: Aceptar Automáticamente */}
@@ -1366,15 +1374,6 @@ export const ClientDashboard: React.FC = () => {
                   />
                 </button>
               </div>
-
-              {/* Botón Flotante para cancelar radar */}
-              <button 
-                className="btn btn-secondary"
-                onClick={handleCancelOrder}
-                style={{ position: 'absolute', top: '16px', left: '16px', borderRadius: '20px', height: '36px', padding: '0 16px', fontSize: '12px', border: '1px solid var(--border-color)' }}
-              >
-                ✕ Cancelar solicitud
-              </button>
             </div>
           )}
 

@@ -1985,6 +1985,32 @@ body {
   cursor: not-allowed;
 }
 
+.btn-cancel-request-sheet {
+  background-color: #FEF2F2;
+  color: #EF4444;
+  height: 44px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-cancel-request-sheet:hover {
+  background-color: #FEE2E2;
+}
+
+.btn-cancel-request-sheet:active {
+  transform: scale(0.98);
+}
+
+
 .auto-accept-row-capsule {
   position: absolute;
   top: 16px; /* Floating at top */
