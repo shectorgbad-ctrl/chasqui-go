@@ -95,6 +95,13 @@ export const ClientDashboard: React.FC = () => {
     return address;
   };
 
+  const getCleanVehicleDesc = (rawVehicle?: string) => {
+    if (!rawVehicle || rawVehicle.includes('Honda') || rawVehicle.includes('GL125') || rawVehicle.includes('Chevrolet') || rawVehicle.includes('ABC-123') || rawVehicle.includes('DEF-456') || rawVehicle.includes('VIP-999')) {
+      return clientState.service === 'delivery' ? 'Moto Lineal' : 'Auto / Taxi';
+    }
+    return rawVehicle;
+  };
+
   // 1. Google Maps Script Loader
   useEffect(() => {
     const DEFAULT_MAPS_KEY = 'AIzaSyA2EvBJgUMRn3q1Wp1m9DJwPKXkF2fhK7I';
@@ -1517,7 +1524,7 @@ export const ClientDashboard: React.FC = () => {
                         <span className="driver-trips-count">Verificado</span>
                       </div>
                       <div className="driver-car-desc">
-                        {clientState.assignedDriver?.vehicle || (clientState.service === 'delivery' ? 'Moto Lineal' : 'Auto / Taxi')}
+                        {getCleanVehicleDesc(clientState.assignedDriver?.vehicle)}
                       </div>
                     </div>
                   </div>
@@ -1569,7 +1576,7 @@ export const ClientDashboard: React.FC = () => {
                   <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                     <span>⭐ {clientState.assignedDriver.rating}</span>
                     <span>•</span>
-                    <span>{clientState.assignedDriver.vehicle}</span>
+                    <span>{getCleanVehicleDesc(clientState.assignedDriver.vehicle)}</span>
                   </div>
                 </div>
               </div>
