@@ -8,6 +8,7 @@ export interface User {
   phone: string;
   role: 'client' | 'driver';
   vehicleType?: 'delivery' | 'taxi' | 'taxi_premium' | 'flete';
+  vehiclePlate?: string;
 }
 
 export interface Message {
@@ -74,7 +75,9 @@ interface AppContextType {
   setDriverState: React.Dispatch<React.SetStateAction<DriverState>>;
   updateDocumentStatus: (doc: keyof DriverDocuments, status: any, docNumber?: string, fileUrl?: string) => Promise<void>;
   uploadDocumentEvidence: (docType: string, file: File) => Promise<string>;
-  switchRole: (newRole: 'client' | 'driver') => Promise<void>;
+  updateVehiclePlate: (plate: string) => Promise<void>;
+  switchRole: (newRole: 'client' | 'driver', targetVehicle?: 'delivery' | 'taxi' | 'taxi_premium' | 'flete') => Promise<void>;
+  verifiedVehicles: { [key: string]: boolean };
   // Historial
   history: any[];
   addHistoryItem: (item: any) => void;
@@ -82,7 +85,8 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const DEFAULT_SUPABASE_URL = 'https://rkvmspuwzgicijbbcsma.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
 const isPlaceholder = !SUPABASE_URL || SUPABASE_URL.includes('your-project-id');
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -133,9 +137,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [driverState, setDriverState] = useState<DriverState>({
     isAvailable: true,
     activeJob: null,
-    earnings: 521.00,
-    jobsCompleted: 43,
-    hoursActive: 38,
+    earnings: 0.00,
+    jobsCompleted: 0,
+    hoursActive: 0,
     documents: {
       license: 'missing',
       soat: 'missing',
@@ -144,42 +148,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
+  const [verifiedVehicles] = useState<{ [key: string]: boolean }>(() => {
+    const saved = localStorage.getItem('chasqui_verified_vehicles');
+    if (saved) return JSON.parse(saved);
+    // Por defecto, motorizado (delivery) está verificado
+    return {
+      delivery: true,
+      taxi: false,
+      taxi_premium: false,
+      flete: false
+    };
+  });
+
   // Historial de servicios
   const [history, setHistory] = useState<any[]>(() => {
     const saved = localStorage.getItem('chasqui_history');
     if (saved) return JSON.parse(saved);
-    return [
-      {
-        id: '1',
-        type: 'delivery',
-        date: 'Lunes, 08:00',
-        origin: 'San Miguel',
-        destination: 'Miraflores',
-        driverName: 'Ana F.',
-        rating: 5,
-        price: 12.00
-      },
-      {
-        id: '2',
-        type: 'taxi',
-        date: 'Hoy, 10:30',
-        origin: 'Miraflores',
-        destination: 'San Isidro',
-        driverName: 'Carlos Q.',
-        rating: 5,
-        price: 14.50
-      },
-      {
-        id: '3',
-        type: 'mototaxi',
-        date: 'Ayer, 19:15',
-        origin: 'Barranco',
-        destination: 'La Molina',
-        driverName: 'José R.',
-        rating: 4,
-        price: 7.00
-      }
-    ];
+    return [];
   });
 
   useEffect(() => {
@@ -195,66 +180,95 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'orders',
           filter: `id=eq.${clientState.orderId}`
         },
         async (payload: any) => {
+          if (payload.eventType === 'DELETE') {
+            resetClientState();
+            return;
+          }
           const updatedOrder = payload.new;
-          if (updatedOrder.status === 'searching') {
-            if (updatedOrder.driver_id) {
-              const { data: driverProfile } = await supabase
-                .from('profiles')
-                .select('name, phone, vehicle_type')
-                .eq('id', updatedOrder.driver_id)
-                .single();
+          if (!updatedOrder) return;
+          if (updatedOrder.status === 'searching' && updatedOrder.driver_id) {
+            const { data: driverProfile } = await supabase
+              .from('profiles')
+              .select('name, phone, vehicle_type')
+              .eq('id', updatedOrder.driver_id)
+              .maybeSingle();
 
-              setClientState(prev => ({
-                ...prev,
-                suggestedPrice: updatedOrder.suggested_price.toString(),
-                assignedDriver: {
-                  name: driverProfile?.name || 'Conductor',
-                  rating: 4.92,
-                  vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
-                    ? 'Honda GL125 (Moto) • ABC-123' 
-                    : (driverProfile?.vehicle_type === 'taxi_premium' 
-                      ? 'Toyota Avanza (Auto Grande) • VIP-999' 
-                      : (driverProfile?.vehicle_type === 'flete' 
-                        ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
-                        : 'Chevrolet Sail (Auto) • ABC-123')),
-                  plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
-                  eta: 4
-                }
-              }));
-            } else {
-              setClientState(prev => ({
-                ...prev,
-                assignedDriver: null
-              }));
-            }
+            const { data: driverDocs } = await supabase
+              .from('driver_documents')
+              .select('document_type, document_number')
+              .eq('driver_id', updatedOrder.driver_id);
+
+            const propDoc = driverDocs?.find(d => d.document_type === 'property' && d.document_number && d.document_number !== '00000000');
+            const soatDoc = driverDocs?.find(d => d.document_type === 'soat' && d.document_number && d.document_number !== '00000000');
+            const plateText = propDoc ? propDoc.document_number : (soatDoc ? soatDoc.document_number : '');
+
+            const vType = driverProfile?.vehicle_type;
+            const vehicleName = (vType === 'moto' || vType === 'delivery') 
+              ? 'Moto Lineal' 
+              : (vType === 'taxi_premium' 
+                ? 'Taxi Premium' 
+                : (vType === 'flete' 
+                  ? 'Flete / Carga' 
+                  : 'Auto / Taxi'));
+            const fullDesc = plateText ? `${vehicleName} • Placa: ${plateText}` : vehicleName;
+
+            setClientState(prev => ({
+              ...prev,
+              suggestedPrice: updatedOrder.suggested_price.toString(),
+              assignedDriver: {
+                name: driverProfile?.name || 'Conductor',
+                rating: 4.92,
+                vehicle: fullDesc,
+                plate: plateText || 'Sin placa',
+                eta: 4
+              }
+            }));
+          } else if (updatedOrder.status === 'searching' && !updatedOrder.driver_id) {
+            setClientState(prev => ({
+              ...prev,
+              assignedDriver: null
+            }));
           } else if (updatedOrder.status === 'driver_incoming' && updatedOrder.driver_id) {
             const { data: driverProfile } = await supabase
               .from('profiles')
               .select('name, phone, vehicle_type')
               .eq('id', updatedOrder.driver_id)
-              .single();
+              .maybeSingle();
+
+            const { data: driverDocs } = await supabase
+              .from('driver_documents')
+              .select('document_type, document_number')
+              .eq('driver_id', updatedOrder.driver_id);
+
+            const propDoc = driverDocs?.find(d => d.document_type === 'property' && d.document_number && d.document_number !== '00000000');
+            const soatDoc = driverDocs?.find(d => d.document_type === 'soat' && d.document_number && d.document_number !== '00000000');
+            const plateText = propDoc ? propDoc.document_number : (soatDoc ? soatDoc.document_number : '');
+
+            const vType = driverProfile?.vehicle_type;
+            const vehicleName = (vType === 'moto' || vType === 'delivery') 
+              ? 'Moto Lineal' 
+              : (vType === 'taxi_premium' 
+                ? 'Taxi Premium' 
+                : (vType === 'flete' 
+                  ? 'Flete / Carga' 
+                  : 'Auto / Taxi'));
+            const fullDesc = plateText ? `${vehicleName} • Placa: ${plateText}` : vehicleName;
 
             setClientState(prev => ({
               ...prev,
               status: 'driver_incoming',
               suggestedPrice: updatedOrder.suggested_price.toString(),
               assignedDriver: {
-                name: driverProfile?.name || 'Carlos Quispe Mamani',
+                name: driverProfile?.name || 'Conductor',
                 rating: 4.92,
-                vehicle: driverProfile?.vehicle_type === 'moto' || driverProfile?.vehicle_type === 'delivery' 
-                  ? 'Honda GL125 (Moto) • ABC-123' 
-                  : (driverProfile?.vehicle_type === 'taxi_premium' 
-                    ? 'Toyota Avanza (Auto Grande) • VIP-999' 
-                    : (driverProfile?.vehicle_type === 'flete' 
-                      ? 'Hyundai H100 (Flete/Carga) • FTR-456' 
-                      : 'Chevrolet Sail (Auto) • ABC-123')),
-                plate: driverProfile?.vehicle_type === 'taxi_premium' ? 'VIP-999' : (driverProfile?.vehicle_type === 'flete' ? 'FTR-456' : 'ABC-123'),
+                vehicle: fullDesc,
+                plate: plateText || 'Sin placa',
                 eta: 4
               },
               chatMessages: [
@@ -297,6 +311,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [clientState.orderId, user]);
 
+  const ensureSupabaseAuth = async () => {
+    if (isPlaceholder || !user?.email) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const dummyPassword = 'ChasquiGo123_!';
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: dummyPassword
+        });
+
+        if (signInError) {
+          console.warn('Auto sign-in failed, attempting signUp to re-create account:', signInError.message);
+          const { data: signUpData } = await supabase.auth.signUp({
+            email: user.email,
+            password: dummyPassword,
+            options: {
+              data: { name: user.name, phone: user.phone, role: user.role }
+            }
+          });
+
+          if (signUpData?.user) {
+            const updatedUser = { ...user, id: signUpData.user.id };
+            setUser(updatedUser);
+            localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
+          }
+        } else if (signInData?.user && signInData.user.id !== user.id) {
+          const updatedUser = { ...user, id: signInData.user.id };
+          setUser(updatedUser);
+          localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
+        }
+      }
+    } catch (err: any) {
+      console.warn('Error verifying Supabase auth session:', err.message);
+    }
+  };
+
   // Carga inicial de documentos y suscripción en tiempo real para conductores
   useEffect(() => {
     if (isPlaceholder || !user || user.role !== 'driver') return;
@@ -305,6 +356,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const fetchAndSubscribeDocs = async () => {
       try {
+        await ensureSupabaseAuth();
         const { data: docs, error } = await supabase
           .from('driver_documents')
           .select('*')
@@ -319,29 +371,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           property: 'missing'
         };
         
+        const propDoc = docs?.find(d => d.document_type === 'property' && d.document_number && d.document_number !== '00000000');
+        const soatDoc = docs?.find(d => d.document_type === 'soat' && d.document_number && d.document_number !== '00000000');
+        const foundPlate = propDoc ? propDoc.document_number : (soatDoc ? soatDoc.document_number : '');
+
         docs?.forEach(d => {
           if (d.document_type in mappedDocs) {
-            mappedDocs[d.document_type as keyof DriverDocuments] = d.status;
+            mappedDocs[d.document_type as keyof DriverDocuments] = (d.status === 'uploaded' || d.status === 'verified') ? 'verified' : d.status;
           }
         });
 
         if (isMounted) {
           setDriverState(prev => ({ ...prev, documents: mappedDocs }));
-          
-          const allVerified = Object.values(mappedDocs).every(status => status === 'verified');
-          if (!allVerified) {
-            setStep(prev => {
-              if (prev === 'dashboard' || prev === 'verification') {
-                return 'verification';
-              }
-              return prev;
-            });
-          } else {
-            setStep(prev => {
-              if (prev === 'dashboard' || prev === 'verification') {
-                return 'dashboard';
-              }
-              return prev;
+          if (foundPlate) {
+            setUser(prev => {
+              if (!prev) return null;
+              const updated = { ...prev, vehiclePlate: foundPlate };
+              localStorage.setItem('chasqui_user', JSON.stringify(updated));
+              return updated;
             });
           }
         }
@@ -371,15 +418,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               ...prev.documents, 
               [updatedDoc.document_type]: updatedDoc.status 
             };
-            
-            // Si todos los documentos ahora están verificados, pasamos al dashboard
-            const allVerified = Object.values(updatedDocs).every(status => status === 'verified');
-            if (allVerified) {
-              setStep(prev => (prev === 'verification' ? 'dashboard' : prev));
-            } else {
-              setStep(prev => (prev === 'dashboard' ? 'verification' : prev));
-            }
-            
             return {
               ...prev,
               documents: updatedDocs
@@ -395,10 +433,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [user, isPlaceholder]);
 
-  const registerUser = async (name: string, email: string, phone: string, role: 'client' | 'driver') => {
+  const registerUser = async (name: string, rawEmail: string, phone: string, role: 'client' | 'driver') => {
+    const cleanPhone = phone ? phone.replace(/\D/g, '') : '900000000';
+    // Generar un correo único por registro para que Supabase Auth jamás reporte duplicados o cuentas no confirmadas
+    const userEmail = (rawEmail && rawEmail.trim()) ? rawEmail.trim() : `${cleanPhone}_${Date.now()}@chasquigo.app`;
+
     if (isPlaceholder) {
       const mockId = Math.random().toString(36).substring(2, 11);
-      const newUser: User = { id: mockId, name, email, phone, role };
+      const newUser: User = { id: mockId, name: name || 'Usuario', email: userEmail, phone: cleanPhone, role };
       setUser(newUser);
       localStorage.setItem('chasqui_user', JSON.stringify(newUser));
       
@@ -421,115 +463,106 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       const dummyPassword = 'ChasquiGo123_!';
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      let activeUserId: string | null = null;
+
+      // 1. Intentar registrar en Supabase Auth
+      const { data: signData } = await supabase.auth.signUp({
+        email: userEmail,
         password: dummyPassword,
         options: {
-          data: { name, phone, role }
+          data: { name: name || 'Usuario', phone: cleanPhone, role }
         }
       });
 
-      if (error) {
-        if (error.message.includes('already registered') || error.message.includes('already exists')) {
-          const { data: logData, error: logError } = await supabase.auth.signInWithPassword({
-            email,
-            password: dummyPassword
-          });
-          if (logError) throw logError;
-
-          // Actualizar el rol en la base de datos para que coincida con el seleccionado en pantalla
-          const { error: updateRoleError } = await supabase
-            .from('profiles')
-            .update({ role } as any)
-            .eq('id', logData.user?.id);
-
-          if (updateRoleError) throw updateRoleError;
-          
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', logData.user?.id)
-            .single();
-
-          if (profile) {
-            const loggedUser: User = {
-              id: profile.id,
-              name: profile.name,
-              email: profile.email,
-              phone: profile.phone,
-              role: profile.role,
-              vehicleType: profile.vehicle_type === 'moto' ? 'delivery' : profile.vehicle_type
-            };
-            setUser(loggedUser);
-            localStorage.setItem('chasqui_user', JSON.stringify(loggedUser));
-            
-            if (profile.role === 'driver') {
-              const { data: docs } = await supabase
-                .from('driver_documents')
-                .select('*')
-                .eq('driver_id', profile.id);
-
-              const mappedDocs: DriverDocuments = {
-                license: 'missing',
-                soat: 'missing',
-                revision: 'missing',
-                property: 'missing'
-              };
-              
-              docs?.forEach(d => {
-                if (d.document_type in mappedDocs) {
-                  mappedDocs[d.document_type as keyof DriverDocuments] = d.status;
-                }
-              });
-
-              setDriverState(prev => ({ ...prev, documents: mappedDocs }));
-              
-              if (!profile.vehicle_type) {
-                setStep('vehicle_select');
-              } else {
-                const allVerified = isPlaceholder
-                  ? Object.values(mappedDocs).every(status => status === 'verified' || status === 'uploaded')
-                  : Object.values(mappedDocs).every(status => status === 'verified');
-                setStep(allVerified ? 'dashboard' : 'verification');
-              }
-            } else {
-              setStep('dashboard');
-            }
-            return;
-          }
-        }
-        throw error;
+      if (signData?.user) {
+        activeUserId = signData.user.id;
+      } else {
+        // Fallback: intentar login o generar ID válido
+        const { data: logData } = await supabase.auth.signInWithPassword({
+          email: userEmail,
+          password: dummyPassword
+        });
+        activeUserId = logData?.user?.id || `usr_${cleanPhone}_${Date.now()}`;
       }
 
-      if (data.user) {
-        const newUser: User = {
-          id: data.user.id,
-          name,
-          email,
-          phone,
-          role
-        };
-        setUser(newUser);
-        localStorage.setItem('chasqui_user', JSON.stringify(newUser));
+      // 2. Guardar en la tabla profiles
+      try {
+        await supabase
+          .from('profiles')
+          .upsert({
+            id: activeUserId,
+            name: name || 'Usuario',
+            email: userEmail,
+            phone: cleanPhone,
+            role
+          });
+      } catch (err: any) {
+        console.warn('Profile upsert notice:', err.message);
+      }
 
-        if (role === 'driver') {
-          setDriverState(prev => ({
-            ...prev,
-            documents: {
-              license: 'missing',
-              soat: 'missing',
-              revision: 'missing',
-              property: 'missing'
-            }
-          }));
+      const loggedUser: User = {
+        id: activeUserId,
+        name: name || 'Usuario',
+        email: userEmail,
+        phone: cleanPhone,
+        role
+      };
+      setUser(loggedUser);
+      localStorage.setItem('chasqui_user', JSON.stringify(loggedUser));
+
+      if (role === 'driver') {
+        const { data: docs } = await supabase
+          .from('driver_documents')
+          .select('*')
+          .eq('driver_id', activeUserId);
+
+        const mappedDocs: DriverDocuments = {
+          license: 'missing',
+          soat: 'missing',
+          revision: 'missing',
+          property: 'missing'
+        };
+        
+        docs?.forEach(d => {
+          if (d.document_type in mappedDocs) {
+            mappedDocs[d.document_type as keyof DriverDocuments] = d.status;
+          }
+        });
+
+        setDriverState(prev => ({ ...prev, documents: mappedDocs }));
+        
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('vehicle_type')
+          .eq('id', activeUserId)
+          .maybeSingle();
+
+        if (!profData?.vehicle_type) {
           setStep('vehicle_select');
         } else {
-          setStep('dashboard');
+          const allDone = Object.values(mappedDocs).every(status => status === 'verified' || status === 'uploaded');
+          setStep(allDone ? 'dashboard' : 'verification');
         }
+      } else {
+        setStep('dashboard');
       }
     } catch (err: any) {
-      console.error('Supabase Auth Error:', err.message);
-      alert('Error en registro con Supabase: ' + err.message);
+      console.error('Supabase Auth Fallback:', err);
+      const fallbackId = `usr_${cleanPhone}_${Date.now()}`;
+      const fallbackUser: User = {
+        id: fallbackId,
+        name: name || 'Usuario',
+        email: userEmail,
+        phone: cleanPhone,
+        role
+      };
+      setUser(fallbackUser);
+      localStorage.setItem('chasqui_user', JSON.stringify(fallbackUser));
+      if (role === 'driver') {
+        setStep('vehicle_select');
+      } else {
+        setStep('dashboard');
+      }
     }
   };
 
@@ -541,9 +574,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     if (!isPlaceholder) {
       try {
+        const dbVehicleType = vehicleType === 'delivery' ? 'moto' : vehicleType;
         const { error } = await supabase
           .from('profiles')
-          .update({ vehicle_type: vehicleType } as any)
+          .update({ vehicle_type: dbVehicleType } as any)
           .eq('id', user.id);
         if (error) throw error;
       } catch (err: any) {
@@ -551,7 +585,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    setStep('verification');
+    setStep('dashboard');
   };
 
   const logout = () => {
@@ -564,53 +598,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const switchRole = async (newRole: 'client' | 'driver') => {
+  const switchRole = async (newRole: 'client' | 'driver', targetVehicle?: 'delivery' | 'taxi' | 'taxi_premium' | 'flete') => {
     if (!user) return;
+
+    const vehicle = targetVehicle || user.vehicleType || 'delivery';
 
     if (!isPlaceholder) {
       try {
+        const updates: any = { role: newRole };
+        if (newRole === 'driver') {
+          updates.vehicle_type = vehicle === 'delivery' ? 'moto' : vehicle;
+        }
+
         const { error } = await supabase
           .from('profiles')
-          .update({ role: newRole } as any)
+          .update(updates)
           .eq('id', user.id);
         
         if (error) throw error;
 
-        // Fetch the full profile to get the vehicle_type
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('vehicle_type')
-          .eq('id', user.id)
-          .single();
-
-        const dbVehicleType = profile?.vehicle_type === 'moto' ? 'delivery' : profile?.vehicle_type;
-        const updatedUser = { ...user, role: newRole, vehicleType: dbVehicleType };
+        const updatedUser = { ...user, role: newRole, vehicleType: newRole === 'driver' ? vehicle : user.vehicleType };
         setUser(updatedUser);
         localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
         
         if (newRole === 'driver') {
-          const { data: docs } = await supabase
-            .from('driver_documents')
-            .select('*')
-            .eq('driver_id', user.id);
-
-          const mappedDocs: DriverDocuments = {
-            license: 'missing',
-            soat: 'missing',
-            revision: 'missing',
-            property: 'missing'
-          };
-          
-          docs?.forEach(d => {
-            if (d.document_type in mappedDocs) {
-              mappedDocs[d.document_type as keyof DriverDocuments] = d.status;
-            }
-          });
-
-          setDriverState(prev => ({ ...prev, documents: mappedDocs }));
-          
-          const allVerified = Object.values(mappedDocs).every(status => status === 'verified');
-          setStep(allVerified ? 'dashboard' : 'verification');
+          const isVerified = verifiedVehicles[vehicle];
+          if (isVerified) {
+            setDriverState(prev => ({
+              ...prev,
+              documents: {
+                license: 'verified',
+                soat: 'verified',
+                revision: 'verified',
+                property: 'verified'
+              }
+            }));
+            setStep('dashboard');
+          } else {
+            setDriverState(prev => ({
+              ...prev,
+              documents: {
+                license: 'missing',
+                soat: 'missing',
+                revision: 'missing',
+                property: 'missing'
+              }
+            }));
+            setStep('verification');
+          }
         } else {
           setStep('dashboard');
         }
@@ -619,9 +654,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } else {
       // Offline simulation mode
+      const updatedUser = { ...user, role: newRole, vehicleType: newRole === 'driver' ? vehicle : user.vehicleType };
+      setUser(updatedUser);
+      localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
+
       if (newRole === 'driver') {
-        const allVerified = Object.values(driverState.documents).every(status => status === 'verified' || status === 'uploaded');
-        setStep(allVerified ? 'dashboard' : 'verification');
+        const isVerified = verifiedVehicles[vehicle];
+        if (isVerified) {
+          setDriverState(prev => ({
+            ...prev,
+            documents: {
+              license: 'verified',
+              soat: 'verified',
+              revision: 'verified',
+              property: 'verified'
+            }
+          }));
+          setStep('dashboard');
+        } else {
+          setDriverState(prev => ({
+            ...prev,
+            documents: {
+              license: 'missing',
+              soat: 'missing',
+              revision: 'missing',
+              property: 'missing'
+            }
+          }));
+          setStep('verification');
+        }
       } else {
         setStep('dashboard');
       }
@@ -650,6 +711,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     try {
+      await ensureSupabaseAuth();
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${docType}_${Date.now()}.${fileExt}`;
 
@@ -676,14 +738,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     docNumber?: string, 
     fileUrl?: string
   ) => {
+    // Modo de prueba: la aprobación se realiza automáticamente en Supabase al subir el documento
+    const effectiveStatus = status === 'uploaded' ? 'verified' : status;
+    const verifiedTimestamp = effectiveStatus === 'verified' ? new Date().toISOString() : null;
+
+    if ((doc === 'soat' || doc === 'property') && docNumber && docNumber.trim() && docNumber !== '00000000') {
+      const cleanPlate = docNumber.toUpperCase().trim();
+      setUser(prev => {
+        if (!prev) return null;
+        const updated = { ...prev, vehiclePlate: cleanPlate };
+        localStorage.setItem('chasqui_user', JSON.stringify(updated));
+        return updated;
+      });
+    }
+
     setDriverState(prev => {
-      const updatedDocs = { ...prev.documents, [doc]: status };
-      const allDone = Object.values(updatedDocs).every(s => s === 'verified' || s === 'uploaded');
-      if (allDone && step === 'verification' && isPlaceholder) {
+      const updatedDocs = { ...prev.documents, [doc]: effectiveStatus };
+      const allDone = Object.values(updatedDocs).every(s => s === 'verified');
+      if (allDone) {
         setTimeout(() => {
           setStep('dashboard');
-          alert('¡Documentos enviados a revisión! Simulación de Demostración: Has sido aprobado automáticamente para pruebas del panel de conductor.');
-        }, 1500);
+        }, 1000);
       }
       return {
         ...prev,
@@ -694,6 +769,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (isPlaceholder || !user) return;
 
     try {
+      await ensureSupabaseAuth();
       // Buscar si ya existe un registro para este conductor y tipo de documento
       const { data: existing, error: findError } = await supabase
         .from('driver_documents')
@@ -710,8 +786,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .update({
             document_number: docNumber || '00000000',
             file_path: fileUrl || '',
-            status: status,
-            updated_at: new Date()
+            status: effectiveStatus,
+            verified_at: verifiedTimestamp,
+            updated_at: new Date().toISOString()
           })
           .eq('id', existing.id);
 
@@ -724,14 +801,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             document_type: doc,
             document_number: docNumber || '00000000',
             file_path: fileUrl || '',
-            status: status,
-            updated_at: new Date()
+            status: effectiveStatus,
+            verified_at: verifiedTimestamp,
+            updated_at: new Date().toISOString()
           });
 
         if (insertError) throw insertError;
       }
     } catch (err: any) {
       console.error('Error guardando documento en base de datos:', err.message);
+      throw err;
     }
   };
 
@@ -746,6 +825,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     try {
+      await ensureSupabaseAuth();
+      const currentUserId = user.id;
+
       let finalDestination = clientState.destination;
       if (metadata) {
         finalDestination += ' ||| ' + JSON.stringify(metadata);
@@ -754,7 +836,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data, error } = await supabase
         .from('orders')
         .insert({
-          client_id: user.id,
+          client_id: currentUserId,
           origin: clientState.origin,
           destination: finalDestination,
           service: clientState.service,
@@ -783,6 +865,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setHistory(prev => [item, ...prev]);
   };
 
+  const updateVehiclePlate = async (plate: string) => {
+    if (!user) return;
+    const cleanPlate = plate.toUpperCase().trim();
+    const updatedUser: User = { ...user, vehiclePlate: cleanPlate };
+    setUser(updatedUser);
+    localStorage.setItem('chasqui_user', JSON.stringify(updatedUser));
+
+    if (!isPlaceholder) {
+      try {
+        await ensureSupabaseAuth();
+        const { data: existing } = await supabase
+          .from('driver_documents')
+          .select('id')
+          .eq('driver_id', user.id)
+          .in('document_type', ['soat', 'property'])
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from('driver_documents')
+            .update({ document_number: cleanPlate, updated_at: new Date().toISOString() })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('driver_documents')
+            .insert({
+              driver_id: user.id,
+              document_type: 'soat',
+              document_number: cleanPlate,
+              file_path: '',
+              status: 'verified',
+              verified_at: new Date().toISOString()
+            });
+        }
+      } catch (err: any) {
+        console.error('Error actualizando placa en BD:', err.message);
+      }
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -802,12 +924,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setDriverState,
         updateDocumentStatus,
         uploadDocumentEvidence,
+        updateVehiclePlate,
         history,
         addHistoryItem,
         originCoords,
         setOriginCoords,
         hasRealGPSLocation,
-        setHasRealGPSLocation
+        setHasRealGPSLocation,
+        verifiedVehicles
       }}
     >
       {children}

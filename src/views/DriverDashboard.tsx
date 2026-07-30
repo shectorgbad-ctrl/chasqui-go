@@ -18,8 +18,6 @@ import {
   Shield,
   Settings,
   HelpCircle,
-  ChevronDown,
-  ChevronUp,
   ChevronRight,
   Navigation,
   ArrowLeft
@@ -38,11 +36,48 @@ const darkMapStyles = [
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] }
 ];
 
+export interface DriverDashboardProps {}
+
 export const DriverDashboard: React.FC = () => {
-  const { user, logout, switchRole, driverState, setDriverState, setStep, isPlaceholder } = useApp();
+  const { user, logout, switchRole, driverState, setDriverState, setStep, isPlaceholder, verifiedVehicles, updateVehiclePlate } = useApp();
   const [activeTab, setActiveTab] = useState<'inicio' | 'ganancias' | 'perfil' | 'seguridad'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
+
+  // Modal para editar placa
+  const [isEditingPlateModal, setIsEditingPlateModal] = useState(false);
+  const [tempPlate, setTempPlate] = useState('');
+  const [dbPlateNumber, setDbPlateNumber] = useState<string>('');
+
+  useEffect(() => {
+    if (!user?.id || isPlaceholder) return;
+    const fetchPlateFromSupabase = async () => {
+      try {
+        const { data: propDoc } = await supabase
+          .from('driver_documents')
+          .select('document_number')
+          .eq('driver_id', user.id)
+          .eq('document_type', 'property')
+          .maybeSingle();
+
+        if (propDoc?.document_number && propDoc.document_number !== '00000000') {
+          setDbPlateNumber(propDoc.document_number);
+        } else {
+          const { data: soatDoc } = await supabase
+            .from('driver_documents')
+            .select('document_number')
+            .eq('driver_id', user.id)
+            .eq('document_type', 'soat')
+            .maybeSingle();
+          if (soatDoc?.document_number && soatDoc.document_number !== '00000000') {
+            setDbPlateNumber(soatDoc.document_number);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching plate from Supabase:', err);
+      }
+    };
+    fetchPlateFromSupabase();
+  }, [user?.id, isPlaceholder, activeTab]);
 
   // Google Maps States
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
@@ -169,7 +204,8 @@ export const DriverDashboard: React.FC = () => {
 
   // 1. Google Maps Script Loader
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const DEFAULT_MAPS_KEY = 'AIzaSyA2EvBJgUMRn3q1Wp1m9DJwPKXkF2fhK7I';
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || DEFAULT_MAPS_KEY;
 
     // Fallback if Google Maps fails to authenticate
     (window as any).gm_authFailure = () => {
@@ -380,7 +416,8 @@ export const DriverDashboard: React.FC = () => {
           .eq('status', 'searching');
 
         if (user.vehicleType) {
-          query = query.eq('service', user.vehicleType);
+          const targetService = (user.vehicleType as string) === 'moto' ? 'delivery' : user.vehicleType;
+          query = query.eq('service', targetService);
         }
 
         const { data, error } = await query
@@ -433,7 +470,8 @@ export const DriverDashboard: React.FC = () => {
             }
           }
 
-          const matchesVehicleType = !user.vehicleType || newRow.service === user.vehicleType;
+          const targetVehicle = (user.vehicleType as string) === 'moto' ? 'delivery' : user.vehicleType;
+          const matchesVehicleType = !user.vehicleType || newRow.service === targetVehicle || newRow.service === user.vehicleType;
 
           if (eventType === 'INSERT') {
             if (newRow.status === 'searching' && matchesVehicleType && (newRow.driver_id === null || newRow.driver_id === user.id)) {
@@ -1163,7 +1201,7 @@ export const DriverDashboard: React.FC = () => {
               <div className="profile-avatar-large" style={{ borderColor: 'var(--accent-lime)' }}>
                 <span>👨</span>
               </div>
-              <h3 style={{ fontSize: '16px', fontWeight: '800', marginTop: '12px' }}>{user?.name || 'Carlos Quispe'}</h3>
+              <h3 style={{ fontSize: '16px', fontWeight: '800', marginTop: '12px' }}>{user?.name || 'Conductor'}</h3>
               <p style={{ fontSize: '11px', color: 'var(--accent-lime)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                 <CheckCircle2 size={12} />
                 CONDUCTOR VERIFICADO
@@ -1171,12 +1209,37 @@ export const DriverDashboard: React.FC = () => {
             </div>
 
             <span className="section-title">MI VEHÍCULO</span>
-            <div className="vehicle-card" style={{ display: 'flex', gap: '10px', alignItems: 'center', margin: '8px 0 18px 0', padding: '10px 12px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
-              <span style={{ fontSize: '24px' }}>🛵</span>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '13px', fontWeight: '700' }}>Moto Lineal (2022)</span>
-                <span style={{ fontSize: '10.5px', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>Placa: ABC-123 • Color: Negro</span>
+            <div className="vehicle-card" style={{ display: 'flex', gap: '12px', alignItems: 'center', margin: '8px 0 18px 0', padding: '12px 14px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+              <span style={{ fontSize: '26px' }}>
+                {user?.vehicleType === 'taxi' ? '🚗' : user?.vehicleType === 'taxi_premium' ? '🚘' : user?.vehicleType === 'flete' ? '🚚' : '🛵'}
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                <span style={{ fontSize: '13px', fontWeight: '800' }}>
+                  {user?.vehicleType === 'taxi' ? 'Auto / Taxi' : user?.vehicleType === 'taxi_premium' ? 'Taxi Premium / SUV' : user?.vehicleType === 'flete' ? 'Flete / Carga' : 'Moto Lineal'}
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--accent-lime)', fontFamily: 'monospace', fontWeight: '700', marginTop: '2px' }}>
+                  Placa: {dbPlateNumber || user?.vehiclePlate || 'Sin registrar'}
+                </span>
               </div>
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  setTempPlate(user?.vehiclePlate || '');
+                  setIsEditingPlateModal(true);
+                }}
+                style={{ 
+                  fontSize: '11px', 
+                  padding: '4px 10px', 
+                  height: '30px', 
+                  borderRadius: '6px', 
+                  color: 'var(--accent-lime)', 
+                  borderColor: 'rgba(163, 230, 53, 0.4)',
+                  backgroundColor: 'rgba(163, 230, 53, 0.08)',
+                  cursor: 'pointer'
+                }}
+              >
+                {user?.vehiclePlate ? 'Editar' : 'Agregar'}
+              </button>
             </div>
 
             <span className="section-title">DOCUMENTOS PRESENTADOS</span>
@@ -2041,15 +2104,14 @@ export const DriverDashboard: React.FC = () => {
                   cursor: 'pointer',
                   color: activeTab === 'perfil' ? 'var(--text-primary)' : '#8F909A',
                   backgroundColor: activeTab === 'perfil' ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
-                  fontWeight: activeTab === 'perfil' ? '700' : '500',
-                  fontSize: '13.5px',
-                  transition: 'all 0.2s'
+                  fontWeight: activeTab === 'perfil' ? '700' : '500'
                 }}
               >
                 <Settings size={18} style={{ color: activeTab === 'perfil' ? 'var(--accent-lime)' : '#8F909A' }} />
                 <span>Configuración</span>
               </div>
 
+              {/* Botón de Ayuda */}
               <div 
                 className="drawer-menu-item"
                 style={{
@@ -2067,95 +2129,299 @@ export const DriverDashboard: React.FC = () => {
                 <HelpCircle size={18} />
                 <span>Ayuda</span>
               </div>
-            </div>
+            </div> 
 
             {/* 3. SECCIÓN INFERIOR: SELECTOR DE MODO */}
-            <div className="drawer-footer" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="drawer-mode-dropdown-container" style={{ position: 'relative', width: '100%' }}>
-                <button 
-                  className="drawer-mode-dropdown-btn" 
-                  onClick={() => setIsModeDropdownOpen(!isModeDropdownOpen)}
+            <div 
+              className="drawer-footer" 
+              style={{ 
+                marginTop: 'auto', 
+                padding: '16px 14px', 
+                borderTop: '1px solid var(--border-color)', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '12px' 
+              }}
+            >
+              <span style={{ fontSize: '10px', color: '#8F909A', fontWeight: '800', letterSpacing: '0.5px' }}>
+                MODO DE USO
+              </span>
+
+              {/* Control Segmentado (Pasajero / Conductor) */}
+              <div style={{ display: 'flex', gap: '6px', backgroundColor: '#1E1E20', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <button
+                  onClick={() => {
+                    if (user?.role === 'client') return;
+                    setIsDrawerOpen(false);
+                    switchRole('client');
+                  }}
                   style={{
-                    width: '100%',
-                    height: '46px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--accent-lime)',
+                    flex: 1,
+                    height: '34px',
+                    borderRadius: '6px',
                     border: 'none',
-                    color: '#000000',
-                    fontSize: '13px',
-                    fontWeight: '800',
+                    backgroundColor: user?.role === 'client' ? 'var(--accent-lime)' : 'transparent',
+                    color: user?.role === 'client' ? '#000000' : '#8F909A',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 16px',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(212, 175, 55, 0.15)'
+                    justifyContent: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s'
                   }}
                 >
-                  <span>Modo conductor</span>
-                  {isModeDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  <span>👤 Pasajero</span>
                 </button>
-
-                {isModeDropdownOpen && (
-                  <div 
-                    className="drawer-mode-dropdown-content"
-                    style={{
-                      position: 'absolute',
-                      bottom: '52px',
-                      left: 0,
-                      width: '100%',
-                      backgroundColor: '#1E1E20',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '10px',
-                      overflow: 'hidden',
-                      zIndex: 2010,
-                      boxShadow: '0 -6px 16px rgba(0,0,0,0.5)'
-                    }}
-                  >
-                    <div 
-                      className="mode-dropdown-item clickable"
-                      onClick={() => {
-                        setIsDrawerOpen(false);
-                        setIsModeDropdownOpen(false);
-                        switchRole('client');
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        color: '#FFFFFF',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid var(--border-color)',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <span>Modo pasajero</span>
-                    </div>
-                    <div 
-                      className="mode-dropdown-item active"
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        color: 'var(--accent-lime)',
-                        backgroundColor: 'rgba(255,255,255,0.02)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
-                      <span>Modo conductor</span>
-                      <span>✓</span>
-                    </div>
-                  </div>
-                )}
+                <button
+                  onClick={() => {
+                    if (user?.role === 'driver') return;
+                    switchRole('driver', user?.vehicleType || 'delivery');
+                  }}
+                  style={{
+                    flex: 1,
+                    height: '34px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: user?.role === 'driver' ? 'var(--accent-lime)' : 'transparent',
+                    color: user?.role === 'driver' ? '#000000' : '#8F909A',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <span>🚖 Conductor</span>
+                </button>
               </div>
 
+              {/* Selector de Vehículo (Solo si es Conductor) */}
+              {user?.role === 'driver' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#8F909A', fontWeight: '800', letterSpacing: '0.5px' }}>
+                    VEHÍCULO ACTIVO
+                  </span>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {/* Motorizado */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'delivery') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'delivery');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'delivery' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'delivery' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🛵</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'delivery' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Motorizado
+                      </span>
+                      {verifiedVehicles.delivery ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
 
+                    {/* Auto */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'taxi') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'taxi');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'taxi' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'taxi' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚗</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'taxi' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Auto
+                      </span>
+                      {verifiedVehicles.taxi ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Auto Grande */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'taxi_premium') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'taxi_premium');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'taxi_premium' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'taxi_premium' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚙</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'taxi_premium' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Auto Grande
+                      </span>
+                      {verifiedVehicles.taxi_premium ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Carga / Mudanza */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'flete') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'flete');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'flete' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'flete' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚚</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'flete' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Carga/Mudanza
+                      </span>
+                      {verifiedVehicles.flete ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDITAR PLACA DE VEHÍCULO */}
+      {isEditingPlateModal && (
+        <div className="modal-overlay" onClick={() => setIsEditingPlateModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '90%', maxWidth: '340px', padding: '20px', borderRadius: '16px' }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '10px', marginBottom: '14px' }}>
+              <span className="modal-title" style={{ fontSize: '15px', fontWeight: '800' }}>Placa de tu Vehículo</span>
+              <button className="modal-close-btn" onClick={() => setIsEditingPlateModal(false)}>
+                <span>✕</span>
+              </button>
+            </div>
+            
+            <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>
+              Ingresa el número oficial de tu placa (SOAT / Tarjeta de propiedad).
+            </p>
+
+            <div className="input-field-group">
+              <label className="input-label" style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: '700' }}>NÚMERO DE PLACA</label>
+              <input 
+                type="text" 
+                className="input-control"
+                placeholder={user?.vehicleType === 'delivery' ? 'Ej: 1234-5A' : 'Ej: ABC-123'}
+                value={tempPlate}
+                onChange={(e) => setTempPlate(e.target.value.toUpperCase())}
+                maxLength={8}
+                style={{ textAlign: 'center', fontSize: '16px', letterSpacing: '2px', fontWeight: 'bold', textTransform: 'uppercase' }}
+              />
             </div>
 
+            <div style={{ display: 'flex', gap: '10px', marginTop: '18px' }}>
+              <button 
+                className="btn btn-secondary btn-block" 
+                onClick={() => setIsEditingPlateModal(false)}
+                style={{ flex: 1, height: '40px', fontSize: '12px' }}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn btn-primary btn-block" 
+                onClick={async () => {
+                  if (!tempPlate.trim()) {
+                    alert('Por favor ingresa tu número de placa.');
+                    return;
+                  }
+                  await updateVehiclePlate(tempPlate.trim());
+                  setIsEditingPlateModal(false);
+                }}
+                style={{ flex: 1, height: '40px', fontSize: '12px', fontWeight: '800' }}
+              >
+                Guardar Placa
+              </button>
+            </div>
           </div>
         </div>
       )}

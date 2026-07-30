@@ -21,8 +21,6 @@ import {
   HelpCircle,
   Bell,
   Car,
-  ChevronDown,
-  ChevronUp,
   ArrowLeft
 } from 'lucide-react';
 
@@ -40,10 +38,9 @@ const darkMapStyles = [
 ];
 
 export const ClientDashboard: React.FC = () => {
-  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder, originCoords, setOriginCoords, hasRealGPSLocation, setHasRealGPSLocation } = useApp();
+  const { user, logout, switchRole, clientState, setClientState, resetClientState, placeRealOrder, history, addHistoryItem, isPlaceholder, originCoords, setOriginCoords, hasRealGPSLocation, setHasRealGPSLocation, verifiedVehicles } = useApp();
   const [activeTab, setActiveTab] = useState<'inicio' | 'historial' | 'billetera' | 'perfil' | 'seguridad'>('inicio');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
 
   // Google Maps States
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
@@ -100,7 +97,8 @@ export const ClientDashboard: React.FC = () => {
 
   // 1. Google Maps Script Loader
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const DEFAULT_MAPS_KEY = 'AIzaSyA2EvBJgUMRn3q1Wp1m9DJwPKXkF2fhK7I';
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || DEFAULT_MAPS_KEY;
 
     // Fallback if Google Maps fails to authenticate
     (window as any).gm_authFailure = () => {
@@ -522,12 +520,13 @@ export const ClientDashboard: React.FC = () => {
   const handleCancelOrder = async () => {
     if (!isPlaceholder && clientState.orderId) {
       try {
-        await supabase
+        const { error } = await supabase
           .from('orders')
           .update({ status: 'cancelled' })
           .eq('id', clientState.orderId);
+        if (error) throw error;
       } catch (err: any) {
-        console.error('Error al cancelar la orden en Supabase:', err.message);
+        console.error('Error al actualizar estado cancelado en Supabase:', err.message);
       }
     }
     resetClientState();
@@ -1513,12 +1512,12 @@ export const ClientDashboard: React.FC = () => {
                     </div>
                     <div className="offer-driver-details">
                       <div className="driver-name-rating">
-                        <strong>{isPlaceholder ? 'Anthony' : (clientState.assignedDriver?.name || 'Conductor')}</strong>
-                        <span className="driver-rating-badge">★ {isPlaceholder ? '4.92' : (clientState.assignedDriver?.rating || '5.00')}</span>
-                        <span className="driver-trips-count">{isPlaceholder ? '2796' : '98'} viajes</span>
+                        <strong>{clientState.assignedDriver?.name || 'Conductor'}</strong>
+                        <span className="driver-rating-badge">★ {clientState.assignedDriver?.rating || '4.92'}</span>
+                        <span className="driver-trips-count">Verificado</span>
                       </div>
                       <div className="driver-car-desc">
-                        {isPlaceholder ? 'Chevrolet Sail' : (clientState.assignedDriver?.vehicle || 'Moto')}
+                        {clientState.assignedDriver?.vehicle || (clientState.service === 'delivery' ? 'Moto Lineal' : 'Auto / Taxi')}
                       </div>
                     </div>
                   </div>
@@ -1614,7 +1613,7 @@ export const ClientDashboard: React.FC = () => {
               </p>
               
               <div style={{ margin: '14px 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Califica tu experiencia con **Anthony**:
+                Califica tu experiencia con **{clientState.assignedDriver?.name || 'tu conductor'}**:
                 <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginTop: '6px', fontSize: '20px' }}>
                   {['⭐', '⭐', '⭐', '⭐', '⭐'].map((s, i) => (
                     <span key={i} style={{ cursor: 'pointer' }}>{s}</span>
@@ -2591,92 +2590,241 @@ export const ClientDashboard: React.FC = () => {
             </div>
 
             {/* 3. SECCIÓN INFERIOR: SELECTOR DE MODO */}
-            <div className="drawer-footer" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="drawer-mode-dropdown-container" style={{ position: 'relative', width: '100%' }}>
-                <button 
-                  className="drawer-mode-dropdown-btn" 
-                  onClick={() => setIsModeDropdownOpen(!isModeDropdownOpen)}
+            <div 
+              className="drawer-footer" 
+              style={{ 
+                marginTop: 'auto', 
+                padding: '16px 14px', 
+                borderTop: '1px solid var(--border-color)', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '12px' 
+              }}
+            >
+              <span style={{ fontSize: '10px', color: '#8F909A', fontWeight: '800', letterSpacing: '0.5px' }}>
+                MODO DE USO
+              </span>
+
+              {/* Control Segmentado (Pasajero / Conductor) */}
+              <div style={{ display: 'flex', gap: '6px', backgroundColor: '#1E1E20', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <button
+                  onClick={() => {
+                    if (user?.role === 'client') return;
+                    setIsDrawerOpen(false);
+                    switchRole('client');
+                  }}
                   style={{
-                    width: '100%',
-                    height: '46px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--accent-lime)',
+                    flex: 1,
+                    height: '34px',
+                    borderRadius: '6px',
                     border: 'none',
-                    color: '#000000',
-                    fontSize: '13px',
-                    fontWeight: '800',
+                    backgroundColor: user?.role === 'client' ? 'var(--accent-lime)' : 'transparent',
+                    color: user?.role === 'client' ? '#000000' : '#8F909A',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 16px',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(212, 175, 55, 0.15)'
+                    justifyContent: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s'
                   }}
                 >
-                  <span>Modo pasajero</span>
-                  {isModeDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  <span>👤 Pasajero</span>
                 </button>
-
-                {isModeDropdownOpen && (
-                  <div 
-                    className="drawer-mode-dropdown-content"
-                    style={{
-                      position: 'absolute',
-                      bottom: '52px',
-                      left: 0,
-                      width: '100%',
-                      backgroundColor: '#1E1E20',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '10px',
-                      overflow: 'hidden',
-                      zIndex: 2010,
-                      boxShadow: '0 -6px 16px rgba(0,0,0,0.5)'
-                    }}
-                  >
-                    <div 
-                      className="mode-dropdown-item active"
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        color: 'var(--accent-lime)',
-                        borderBottom: '1px solid var(--border-color)',
-                        backgroundColor: 'rgba(255,255,255,0.02)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
-                      <span>Modo pasajero</span>
-                      <span>✓</span>
-                    </div>
-                    <div 
-                      className="mode-dropdown-item clickable"
-                      onClick={() => {
-                        setIsDrawerOpen(false);
-                        setIsModeDropdownOpen(false);
-                        switchRole('driver');
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        color: '#FFFFFF',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <span>Modo conductor</span>
-                    </div>
-                  </div>
-                )}
+                <button
+                  onClick={() => {
+                    if (user?.role === 'driver') return;
+                    switchRole('driver', user?.vehicleType || 'delivery');
+                  }}
+                  style={{
+                    flex: 1,
+                    height: '34px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: user?.role === 'driver' ? 'var(--accent-lime)' : 'transparent',
+                    color: user?.role === 'driver' ? '#000000' : '#8F909A',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <span>🚖 Conductor</span>
+                </button>
               </div>
 
+              {/* Selector de Vehículo (Solo si es Conductor) */}
+              {user?.role === 'driver' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#8F909A', fontWeight: '800', letterSpacing: '0.5px' }}>
+                    VEHÍCULO ACTIVO
+                  </span>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {/* Motorizado */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'delivery') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'delivery');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'delivery' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'delivery' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🛵</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'delivery' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Motorizado
+                      </span>
+                      {verifiedVehicles.delivery ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
 
+                    {/* Auto */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'taxi') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'taxi');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'taxi' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'taxi' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚗</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'taxi' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Auto
+                      </span>
+                      {verifiedVehicles.taxi ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Auto Grande */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'taxi_premium') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'taxi_premium');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'taxi_premium' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'taxi_premium' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚙</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'taxi_premium' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Auto Grande
+                      </span>
+                      {verifiedVehicles.taxi_premium ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Carga / Mudanza */}
+                    <div
+                      onClick={() => {
+                        if (user?.vehicleType === 'flete') return;
+                        setIsDrawerOpen(false);
+                        switchRole('driver', 'flete');
+                      }}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#1E1E20',
+                        border: user?.vehicleType === 'flete' ? '1.5px solid var(--accent-lime)' : '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: user?.vehicleType === 'flete' ? '0 0 10px rgba(163, 230, 53, 0.15)' : 'none'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>🚚</span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: user?.vehicleType === 'flete' ? 'var(--accent-lime)' : '#FFFFFF' }}>
+                        Carga/Mudanza
+                      </span>
+                      {verifiedVehicles.flete ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-lime)' }}></span>
+                          <span style={{ fontSize: '9px', color: 'var(--accent-lime)', fontWeight: '600' }}>Habilitado</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#8F909A' }}></span>
+                          <span style={{ fontSize: '9px', color: '#8F909A', fontWeight: '500' }}>Verificar</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-
           </div>
         </div>
       )}

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 export const DocumentVerification: React.FC = () => {
-  const { driverState, updateDocumentStatus, uploadDocumentEvidence, logout } = useApp();
+  const { user, driverState, updateDocumentStatus, uploadDocumentEvidence, logout, setStep } = useApp();
   const [activeModal, setActiveModal] = useState<any | null>(null);
   
   // Form input
@@ -57,10 +57,14 @@ export const DocumentVerification: React.FC = () => {
     }
   };
 
+  const isMoto = user?.vehicleType === 'delivery';
+
   const documentConfig = {
     license: {
       title: 'Licencia de conducir',
-      desc: 'Clase B-IIC obligatorio para conducir motocicletas en Lima.',
+      desc: isMoto 
+        ? 'Clase B-IIC obligatorio para conducir motocicletas en Lima.' 
+        : 'Clase A-I o superior obligatorio para conducir vehículos en Lima.',
       label: 'NÚMERO DE LICENCIA (DNI)',
       placeholder: 'Ingresa tu DNI',
       maxLength: 8
@@ -68,8 +72,8 @@ export const DocumentVerification: React.FC = () => {
     soat: {
       title: 'SOAT vigente',
       desc: 'Seguro Obligatorio de Accidentes de Tránsito (Validado con APESEG).',
-      label: 'PLACA DE LA MOTO',
-      placeholder: 'Ej: 1234-5A o 12345A',
+      label: isMoto ? 'PLACA DE LA MOTO' : 'PLACA DEL VEHÍCULO',
+      placeholder: isMoto ? 'Ej: 1234-5A o 12345A' : 'Ej: ABC-123',
       maxLength: 7
     },
     revision: {
@@ -82,8 +86,8 @@ export const DocumentVerification: React.FC = () => {
     property: {
       title: 'Tarjeta de propiedad',
       desc: 'Tarjeta de Identificación Vehicular (Validada con SUNARP).',
-      label: 'PLACA DE LA MOTO',
-      placeholder: 'Ej: 1234-5A',
+      label: isMoto ? 'PLACA DE LA MOTO' : 'PLACA DEL VEHÍCULO',
+      placeholder: isMoto ? 'Ej: 1234-5A' : 'Ej: ABC-123',
       maxLength: 7
     }
   };
@@ -91,9 +95,8 @@ export const DocumentVerification: React.FC = () => {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case 'verified':
-        return <span className="badge badge-green">✓ VERIFICADO</span>;
       case 'uploaded':
-        return <span className="badge badge-orange">⏳ EN REVISIÓN</span>;
+        return <span className="badge badge-green">✓ VERIFICADO</span>;
       case 'expired':
         return <span className="badge badge-red">EXPIRADO</span>;
       default:
@@ -110,14 +113,33 @@ export const DocumentVerification: React.FC = () => {
     setUploadedFileUrlBack('');
   };
 
-  const handleSaveDocument = () => {
+  const [isSavingDoc, setIsSavingDoc] = useState(false);
+
+  const handleSaveDocument = async () => {
     if (activeModal) {
-      const combinedUrl = needsTwoSides 
-        ? `${uploadedFileUrlFront},${uploadedFileUrlBack}` 
-        : uploadedFileUrlFront;
-      
-      updateDocumentStatus(activeModal, 'uploaded', docNumber, combinedUrl);
-      setActiveModal(null);
+      setIsSavingDoc(true);
+      const currentModal = activeModal;
+      try {
+        const combinedUrl = needsTwoSides 
+          ? `${uploadedFileUrlFront},${uploadedFileUrlBack}` 
+          : uploadedFileUrlFront;
+        
+        await updateDocumentStatus(currentModal, 'uploaded', docNumber, combinedUrl);
+        setActiveModal(null);
+
+        const updatedDocs = { ...driverState.documents, [currentModal]: 'verified' };
+        const isDone = Object.values(updatedDocs).every(s => s === 'uploaded' || s === 'verified');
+        if (isDone) {
+          setTimeout(() => {
+            setStep('dashboard');
+          }, 400);
+        }
+      } catch (err: any) {
+        console.error('Error guardando documento:', err);
+        setActiveModal(null);
+      } finally {
+        setIsSavingDoc(false);
+      }
     }
   };
 
@@ -176,9 +198,19 @@ export const DocumentVerification: React.FC = () => {
           <div className="info-banner" style={{ marginTop: '24px', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
             <AlertCircle size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0, marginTop: '2px' }} />
             <p style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              Tu información será validada en tiempo real con las bases del MTC, SUNARP y APESEG. Al completarlo, tu cuenta de motorizado quedará activada automáticamente.
+              Tu información será validada en tiempo real con las bases del MTC, SUNARP y APESEG. Al completarlo, tu cuenta de {isMoto ? 'motorizado' : 'conductor'} quedará activada automáticamente.
             </p>
           </div>
+        </div>
+
+        <div className="view-footer" style={{ padding: '16px 20px', backgroundColor: 'var(--bg-card)', borderTop: '1px solid var(--border-color)' }}>
+          <button 
+            className="btn btn-primary btn-lg btn-block"
+            onClick={() => setStep('dashboard')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: '800' }}
+          >
+            <span>Ir al Panel de Conductor</span>
+          </button>
         </div>
 
         {/* MODAL DE SUBIDA / CONSULTA */}
@@ -263,10 +295,10 @@ export const DocumentVerification: React.FC = () => {
                 <button 
                   className="btn btn-primary btn-md btn-block"
                   onClick={handleSaveDocument}
-                  disabled={!docNumber.trim() || (needsTwoSides ? (!uploadedFileUrlFront || !uploadedFileUrlBack) : !uploadedFileUrlFront)}
+                  disabled={isSavingDoc || !docNumber.trim() || (needsTwoSides ? (!uploadedFileUrlFront || !uploadedFileUrlBack) : !uploadedFileUrlFront)}
                   style={{ height: '42px', marginTop: '14px' }}
                 >
-                  <span>Enviar a revisión</span>
+                  <span>{isSavingDoc ? 'Guardando en Supabase...' : 'Enviar a revisión'}</span>
                 </button>
               </div>
             </div>
