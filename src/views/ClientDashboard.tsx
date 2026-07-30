@@ -445,7 +445,7 @@ export const ClientDashboard: React.FC = () => {
           date: 'Hoy, ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
           origin: clientState.origin.split(',')[0],
           destination: clientState.destination.split(',')[0],
-          driverName: clientState.assignedDriver?.name || 'Anthony',
+          driverName: clientState.assignedDriver?.name || 'Conductor',
           rating: 5,
           price: priceOffer
         });
@@ -551,11 +551,11 @@ export const ClientDashboard: React.FC = () => {
     setClientState(prev => ({
       ...prev,
       status: 'driver_incoming',
-      assignedDriver: {
-        name: 'Anthony',
+      assignedDriver: prev.assignedDriver || {
+        name: 'Conductor',
         rating: 4.92,
-        vehicle: 'Chevrolet Sail (Auto) • DEF-456',
-        plate: 'DEF-456',
+        vehicle: prev.service === 'delivery' ? 'Moto Lineal' : 'Auto / Taxi',
+        plate: '',
         eta: 4
       },
       chatMessages: [
@@ -1491,7 +1491,7 @@ export const ClientDashboard: React.FC = () => {
                 Elige a un conductor
               </h2>
 
-              {/* Tarjeta de Oferta de Conductor (Anthony) */}
+              {/* Tarjeta de Oferta de Conductor */}
               <div className="driver-offer-card-white-wrapper">
                 <div className="driver-offer-card-white">
                   
